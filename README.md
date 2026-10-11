@@ -1,5 +1,7 @@
 # 诸神的差事
 
+> 第一次看这个项目？先读 [docs/brief.md](docs/brief.md)：概念、基调、每集玩法和已知问题都在里面。
+
 一组荒诞短剧。你是奥林匹斯新录用的公务员，每一集被调去一份新的天罚岗位。
 
 在线游玩：https://sunnyyan991.github.io/Sisyphus/
