@@ -88,7 +88,7 @@ footer{grid-column:1/-1;font-size:12px;opacity:.75;line-height:1.8}
     <div class="info" id="info"></div>
   </section>
 
-  <footer>灵感来自希腊神话、加缪《西西弗斯神话》与卡夫卡《普罗米修斯》。键盘可用 ↑ ↓ 选择差事。</footer>
+  <footer>灵感来自希腊神话、加缪《西西弗斯神话》、卡夫卡《普罗米修斯》与菲利帕·福特的电车难题。键盘可用 ↑ ↓ 选择差事。</footer>
 </main>
 
 <script>
@@ -100,7 +100,10 @@ const EPS=[
   {id:'prometheus',no:'二',title:'普罗米修斯，四种说法',job:'啄肝鹰（外包）',href:'prometheus/index.html',
    blurb:'宙斯的鹰辞职了，你穿上中号的鹰制服顶班。关于这份工作有四种说法，他坚持认为那是一件事的四个阶段。',
    chapters:[['序章','轮岗'],['传说之一','锁链'],['传说之二','岩石'],['传说之三','遗忘'],['传说之四','疲倦'],['尾声','山']]},
-  {id:'tbd',no:'三',title:'待定',job:'岗位空缺',locked:true,blurb:'赫尔墨斯还在找下一个岗位。'}
+  {id:'trolley',no:'三',title:'电车又来了',job:'扳道工',href:'trolley/index.html',
+   blurb:'你被借调到哲学部。电车开过来，你来扳道岔。每一章的工作方式都不一样：拉杆、谈判、解道岔谜题，最后亲自开车漂移。',
+   chapters:[['序章','调岗'],['第一章','标准版'],['第二章','天桥'],['第三章','论文'],['第四章','多轨漂移'],['第五章','环线']]},
+  {id:'tbd',no:'四',title:'待定',job:'岗位空缺',locked:true,blurb:'赫尔墨斯还在找下一个岗位。'}
 ];
 const $=id=>document.getElementById(id);
 let progress={};
@@ -117,7 +120,7 @@ function renderList(){
 }
 function renderInfo(){
   const e=EPS[sel],p=progress[e.id]||{},seen=p.seen||[];
-  if(e.locked){$('info').className='info tbd';$('info').innerHTML=`<h2>第三份差事</h2><p>${e.blurb}</p>`;return;}
+  if(e.locked){$('info').className='info tbd';$('info').innerHTML=`<h2>第${e.no}份差事</h2><p>${e.blurb}</p>`;return;}
   const last=seen.length&&!p.done?Math.max(...seen):0;
   $('info').className='info';
   $('info').innerHTML=`<h2>${e.title}</h2><p>${e.blurb}</p>
@@ -222,6 +225,30 @@ function prometheus(t){
   ctx.fillStyle=C.bone;for(let i=0;i<4;i++){const a=Math.PI*(1.15+i*.22);ctx.beginPath();ctx.ellipse(R*.78+Math.cos(a)*R*.33,-R*.45+Math.sin(a)*R*.33,R*.11,R*.045,a+Math.PI/2,0,7);ctx.fill();}
   ctx.restore();
 }
+function trolleyV(t){
+  frame();
+  ctx.fillStyle=C.deep;ctx.fillRect(0,H*.86,W,H*.08);
+  const R=H*.05,y0=H*.72,y1=H*.46,fx=W*.36;
+  const rail=pts=>{ctx.strokeStyle=C.ink;ctx.lineWidth=3;ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.stroke();};
+  rail([[0,y0],[W,y0]]);rail([[fx,y0],[fx+W*.1,y1],[W,y1]]);
+  const k=(t%5)/5,flip=Math.floor(t/5)%2===1;
+  const people=(x,y,n)=>{ctx.fillStyle=C.ink;ctx.strokeStyle=C.ink;ctx.lineWidth=R*.18;for(let i=0;i<n;i++){const px=x+(i-(n-1)/2)*R*.8;
+    ctx.beginPath();ctx.moveTo(px,y);ctx.lineTo(px,y-R*1.3);ctx.stroke();ctx.beginPath();ctx.arc(px,y-R*1.5,R*.22,0,7);ctx.fill();}};
+  // trolley position along the chosen branch
+  const d=k*1.3;let x,y,a=0;
+  if(d*W<fx){x=d*W;y=y0;}else if(!flip){x=d*W;y=y0;}
+  else{const u=Math.min(1,(d*W-fx)/(W*.1));x=d*W;y=lerp(y0,y1,u);a=u<1?Math.atan2(y1-y0,W*.1):0;}
+  const hitMain=!flip&&x>W*.78,hitUp=flip&&x>W*.78;
+  if(!hitMain)people(W*.82,y0,5);if(!hitUp)people(W*.82,y1,1);
+  ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.fillStyle=C.ink;ctx.fillRect(-R*1.7,-R*1.9,R*3.4,R*1.6);
+  ctx.fillStyle=C.bone;for(let i=0;i<3;i++)ctx.fillRect(-R*1.35+i*R*.95,-R*1.6,R*.6,R*.5);
+  ctx.fillStyle=C.ink;[-R,R].forEach(wx=>{ctx.beginPath();ctx.arc(wx,-R*.2,R*.3,0,7);ctx.fill();});ctx.restore();
+  // lever
+  const lx=W*.26,ly=H*.86,la=flip?.6:-.6;ctx.fillStyle=C.ink;ctx.fillRect(lx-R*.9,ly-R*.6,R*1.8,R*.6);
+  ctx.strokeStyle=C.ink;ctx.lineWidth=R*.28;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(lx,ly-R*.5);ctx.lineTo(lx+Math.sin(la)*R*2.2,ly-R*.5-Math.cos(la)*R*2.2);ctx.stroke();
+  ctx.fillStyle=C.bone;ctx.beginPath();ctx.arc(lx+Math.sin(la)*R*2.2,ly-R*.5-Math.cos(la)*R*2.2,R*.38,0,7);ctx.fill();
+}
+const lerp=(a,b,t)=>a+(b-a)*t;
 function tbd(t){
   frame();
   ctx.fillStyle=C.ink;ctx.font=`900 ${Math.max(40,H*.4)}px "Noto Serif SC",serif`;ctx.textAlign='center';ctx.textBaseline='middle';
@@ -230,7 +257,7 @@ function tbd(t){
 const t0=performance.now();
 function loop(now){
   const t=reduce?2.6:(now-t0)/1000;
-  if(W){const id=EPS[sel].id;(id==='sisyphus'?sisyphus:id==='prometheus'?prometheus:tbd)(t);}
+  if(W){const id=EPS[sel].id;(id==='sisyphus'?sisyphus:id==='prometheus'?prometheus:id==='trolley'?trolleyV:tbd)(t);}
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);

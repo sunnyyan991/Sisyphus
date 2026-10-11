@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="诸神的差事第三集：你被借调到哲学部当扳道工，电车又来了。">
+<title>电车又来了</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+/* Layout: same black-figure vase panel as the series — HUD rim above, painted scene as the stage, dialogue scroll below. */
+:root{
+  --clay:#c96a32;
+  --clay-deep:#ad5527;
+  --clay-light:#dc8a52;
+  --ink:#1b1410;
+  --bone:#f3e2c7;
+  --gold:#e8b04f;
+  --display:"Noto Serif SC","Songti SC","STSong",serif;
+  --body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  color-scheme:light;
+}
+[hidden]{display:none!important}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{background:var(--clay);color:var(--ink);font-family:var(--body);margin:0;overflow:hidden}
+.app{height:100%;max-width:980px;margin:0 auto;padding-inline:16px;padding-block:12px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 20px}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(22px,4.6vw,34px);margin:0;letter-spacing:.04em;line-height:1.1;text-wrap:balance}
+h1 small{display:block;font-family:var(--body);font-weight:500;font-size:12px;letter-spacing:.18em;opacity:.75;margin-top:4px}
+.hud{display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat span{font-size:11px;letter-spacing:.14em;opacity:.75}
+.stat b{font-family:var(--display);font-size:22px;font-variant-numeric:tabular-nums;line-height:1}
+.stat b.chap{font-size:17px;letter-spacing:.06em}
+.mind{flex:1 1 200px;min-width:180px;max-width:250px}
+.mind .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.mind em{font-style:normal;font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.06em}
+.scale{position:relative;height:10px;margin-top:5px;border:2px solid var(--ink);background:var(--clay-light)}
+.scale::after{content:"";position:absolute;left:50%;top:-5px;bottom:-5px;width:2px;background:var(--ink)}
+.scale i{position:absolute;top:50%;left:50%;width:12px;height:12px;background:var(--ink);border:2px solid var(--bone);transform:translate(-50%,-50%) rotate(45deg);transition:left .35s}
+.ends{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.14em;opacity:.75;margin-top:3px}
+.stage{flex:1;min-height:240px;min-width:0;position:relative;border:3px solid var(--ink);border-radius:3px;overflow:hidden;touch-action:manipulation;cursor:pointer;user-select:none;-webkit-user-select:none}
+canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(27,20,16,.55)}
+.card{background:var(--ink);color:var(--bone);border:2px solid var(--bone);outline:3px solid var(--ink);padding:22px 22px 20px;max-width:400px;width:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;cursor:default}
+.card h2{font-family:var(--display);font-weight:900;font-size:24px;margin:0;letter-spacing:.06em;text-wrap:balance}
+.card p{margin:0;line-height:1.7;font-size:14px;opacity:.92}
+.card .q{font-family:var(--display);font-size:14px;opacity:.85;border-top:1px solid rgba(243,226,199,.25);padding-top:10px}
+.card .verdict{font-family:var(--display);font-size:22px;color:var(--gold);letter-spacing:.06em}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.chapcard{background:transparent;pointer-events:none;flex-direction:column;gap:6px;color:var(--bone);text-align:center;animation:chapIn .5s ease-out}
+.chapcard .n{font-family:var(--display);font-size:14px;letter-spacing:.5em;padding-left:.5em;opacity:.85}
+.chapcard .t{font-family:var(--display);font-weight:900;font-size:clamp(40px,9vw,72px);letter-spacing:.2em;padding-left:.2em;line-height:1.1;text-shadow:0 3px 0 var(--ink)}
+.chapcard .rule{width:min(260px,60%);height:8px;border-block:2px solid var(--bone);margin-top:6px}
+@keyframes chapIn{from{opacity:0;transform:translateY(8px)}}
+button,.btn{font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:.12em;background:var(--clay);color:var(--ink);border:2px solid var(--bone);padding:10px 20px;border-radius:2px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.ghost{background:transparent;color:var(--bone);font-size:14px;padding:8px 14px}
+button:hover,.btn:hover{background:var(--gold);color:var(--ink)}
+button:focus-visible,.btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.dlg{position:relative;min-height:84px;background:var(--ink);color:var(--bone);border:2px solid var(--ink);box-shadow:inset 0 0 0 2px var(--bone);padding:12px 18px 14px;box-sizing:border-box;display:flex;flex-direction:column;gap:4px;cursor:pointer;user-select:none;-webkit-user-select:none}
+.dlg .who{font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.18em;color:var(--gold);min-height:1.2em}
+.dlg .who small{font-family:var(--body);font-weight:400;font-size:11px;letter-spacing:.08em;color:var(--bone);opacity:.6;margin-left:8px}
+.dlg .txt{font-family:var(--display);font-weight:700;font-size:clamp(15px,2.2vw,18px);line-height:1.6;min-width:0;padding-right:28px}
+.dlg.narr .txt{font-weight:400;opacity:.85;letter-spacing:.08em}
+.dlg.hint .txt{font-family:var(--body);font-weight:400;font-size:14px;opacity:.7;letter-spacing:.06em}
+.dlg .more{position:absolute;right:14px;bottom:10px;font-size:12px;color:var(--gold);animation:blink 1s steps(2) infinite}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.opts button{font-size:14px;letter-spacing:.06em;padding:8px 14px;background:transparent;color:var(--bone);border:1.5px solid var(--bone)}
+.opts button:hover{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+.opts button kbd{font-family:var(--body);font-size:11px;opacity:.6;margin-right:6px}
+@keyframes blink{50%{opacity:0}}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;opacity:.85;flex-wrap:wrap}
+.foot button{font-family:var(--body);font-size:12px;letter-spacing:.06em;padding:4px 10px;background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.foot button:hover{background:var(--clay-light)}
+.foot .meta{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.back{color:var(--ink);font-weight:700;text-decoration:none;border-bottom:1.5px solid var(--ink);letter-spacing:.06em}
+.back:hover{color:var(--bone);border-color:var(--bone)}
+.back:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+@media (max-width:480px){.stat b{font-size:18px}.hud{gap:12px}.dlg{min-height:96px}}
+@media (prefers-reduced-motion:reduce){.chapcard,.dlg .more{animation:none}.scale i{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>电车又来了<small>诸神的差事 · 第三集</small></h1>
+    <div class="hud">
+      <div class="stat"><span>章节</span><b class="chap" id="chap">序</b></div>
+      <div class="stat"><span>拉杆</span><b id="pulls">0</b></div>
+      <div class="stat mind"><div class="top"><span>你的立场</span><em id="mood">还没表态</em></div><div class="scale"><i id="marker"></i></div><div class="ends"><span>功利</span><span>第三条路</span><span>义务</span></div></div>
+    </div>
+  </header>
+
+  <div class="stage" id="stage">
+    <canvas id="c"></canvas>
+    <div class="overlay chapcard" id="chapCard" hidden><div class="n" id="chapN">第一章</div><div class="t" id="chapT">标准版</div><div class="rule"></div></div>
+    <div class="overlay" id="ovTitle">
+      <div class="card">
+        <h2>你被借调到哲学部了</h2>
+        <p>这里的工作都是思想实验，没人会真的受伤。你的新岗位是扳道工。</p>
+        <p>点画面或按空格操作，对话也是点一下翻页。每一章的工作方式都不一样，注意看提示。</p>
+        <div class="row"><button id="btnStart">领取扳道杆</button></div>
+      </div>
+    </div>
+    <div class="overlay" id="ovEnd" hidden>
+      <div class="card">
+        <h2>完</h2>
+        <div class="verdict" id="verdict"></div>
+        <p id="endText"></p>
+        <p class="q">电车难题由哲学家菲利帕·福特在 1967 年提出。此后，这辆电车再也没有停下来过。</p>
+        <div class="row"><button id="btnAgain">从头再来</button><a class="btn ghost" href="../index.html">回到主界面</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dlg hint" id="dlg" role="status" aria-live="polite">
+    <div class="who" id="who"></div>
+    <div class="txt" id="txt">哲学部，轨道调度处。</div>
+    <div class="opts" id="opts" hidden></div>
+    <div class="more" id="more" hidden>▼</div>
+  </div>
+
+  <div class="foot">
+    <span class="meta"><a class="back" href="../index.html">← 主界面</a><span>灵感来自菲利帕·福特的电车难题，以及它在网上的所有变体。</span></span>
+    <button id="btnSound" type="button" aria-pressed="true">声音：开</button>
+  </div>
+</div>
+
+<script>
+(()=>{
+const C={clay:'#c96a32',deep:'#ad5527',light:'#dc8a52',ink:'#1b1410',bone:'#f3e2c7',gold:'#e8b04f',far:'#bd6230'};
+const FONT='"Noto Serif SC","Songti SC",serif';
+const cvs=document.getElementById('c'),ctx=cvs.getContext('2d'),stage=document.getElementById('stage');
+const $=id=>document.getElementById(id);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W=0,H=0,g={};
+function resize(){
+  const r=stage.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);
+  W=r.width;H=r.height;if(!W||!H)return;
+  cvs.width=Math.round(W*dpr);cvs.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+  const band=Math.max(10,Math.min(22,H*.05));
+  g={band,R:Math.max(10,Math.min(W*.03,H*.05)),gy:H-band*1.6-H*.02};
+}
+if('ResizeObserver' in window)new ResizeObserver(()=>resize()).observe(stage);else addEventListener('resize',resize);
+const lerp=(a,b,t)=>a+(b-a)*t;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+
+// ---------- track graphs (normalized coordinates) ----------
+const GRAPHS={
+  fork:{s0:{pts:[[-.15,.72],[.36,.72]],sw:'A',opts:['main','up']},main:{pts:[[.36,.72],[1.25,.72]]},up:{pts:[[.36,.72],[.47,.48],[1.25,.48]]}},
+  bridge:{s0:{pts:[[-.15,.78],[1.25,.78]]}},
+  net:{s0:{pts:[[-.15,.56],[.2,.56]],sw:'A',opts:['u','d']},
+       u:{pts:[[.2,.56],[.28,.37],[.46,.37]],sw:'B',opts:['r0','r1']},
+       d:{pts:[[.2,.56],[.28,.75],[.46,.75]],sw:'C',opts:['r2','r3']},
+       r0:{pts:[[.46,.37],[.53,.28],[1.25,.28]]},r1:{pts:[[.46,.37],[.53,.46],[1.25,.46]]},
+       r2:{pts:[[.46,.75],[.53,.66],[1.25,.66]]},r3:{pts:[[.46,.75],[.53,.84],[1.25,.84]]}}
+};
+const ROWY={r0:.28,r1:.46,r2:.66,r3:.84};
+const segPx=id=>S.G[id].pts.map(([x,y])=>[x*W,y*H]);
+function segLen(id){const p=segPx(id);let L=0;for(let i=1;i<p.length;i++)L+=Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]);return L;}
+function pointAt(id,t){
+  const p=segPx(id);let L=segLen(id)*Math.max(0,Math.min(1,t));
+  for(let i=1;i<p.length;i++){const l=Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]);
+    if(L<=l||i===p.length-1){const k=l?Math.min(1,L/l):0;return {x:lerp(p[i-1][0],p[i][0],k),y:lerp(p[i-1][1],p[i][1],k),a:Math.atan2(p[i][1]-p[i-1][1],p[i][0]-p[i-1][0])};}
+    L-=l;}
+}
+function routeFrom(seg){const out=[seg];let s=seg;while(S.G[s].sw){s=S.G[s].opts[S.sw[S.G[s].sw]];out.push(s);}return out;}
+
+// ---------- the script ----------
+const WHO={H:['赫尔墨斯','哲学部（借调）'],E:['你','扳道工'],F:['五个人','思想实验人员'],O:['那一个人','思想实验人员'],
+  B:['背包客','天桥上'],V:['论文志愿者','思想实验人员'],N:['','']};
+const SCRIPT=[
+  {t:'chapter',n:'序章',title:'调岗'},
+  {t:'scene',id:'fork'},
+  {t:'say',who:'H',text:'啄肝的岗位撤编了。肝……长不动了。'},
+  {t:'say',who:'H',text:'你被借调到哲学部。'},
+  {t:'say',who:'H',text:'别紧张。这里都是思想实验，没人会真的受伤。最多飞一下。'},
+  {t:'say',who:'N',text:'你领到了一根扳道杆。'},
+  {t:'say',who:'H',text:'你的新岗位：扳道工。'},
+
+  {t:'chapter',n:'第一章',title:'标准版'},
+  {t:'say',who:'H',text:'电车要开过来了。主轨上有五个人，岔道上有一个人。'},
+  {t:'say',who:'H',text:'你可以扳道岔，也可以不扳。不扳也是一种选择。'},
+  {t:'say',who:'F',text:'我们是专业的思想实验人员。被撞了就是飞一下。'},
+  {t:'say',who:'O',text:'但是飞一下很丢人。'},
+  {t:'fork',hint:'点画面扳道岔，电车经过道岔之前都能改。',speed:.13,
+    groups:[{seg:'main',n:5,label:'五个人',who:'F'},{seg:'up',n:1,label:'一个人',who:'O'}],
+    react:{main:['F','下次能不能提前说一声？'],up:['O','为什么每次都是我？']}},
+  {t:'say',who:'H',text:'第二趟。这次岔道上的人，你可能认识。'},
+  {t:'fork',hint:'同样的规则。',speed:.15,
+    groups:[{seg:'main',n:5,label:'五个哲学系学生',who:'F'},{seg:'up',n:1,label:'鹰（已离职）',who:'O'}],
+    react:{main:['F','我们论文还没交！'],up:['O','我都离职了！']}},
+  {t:'say',who:'H',text:()=>S.util>S.deon?'你拉杆了。宙斯说，你是个算账的人。':S.deon>S.util?'你没拉杆。宙斯说，你是个讲原则的人。':'一次拉，一次没拉。宙斯说，你是个摇摆的人。'},
+  {t:'say',who:'H',text:'他还说，这叫数据。'},
+
+  {t:'chapter',n:'第二章',title:'天桥'},
+  {t:'scene',id:'bridge'},
+  {t:'say',who:'H',text:'这一趟没有道岔。'},
+  {t:'trolleyIn'},
+  {t:'say',who:'N',text:'电车停在远处，等你想清楚。天桥上站着一个背着巨大背包的人。'},
+  {t:'choice',who:'B',text:'你看我干嘛？',options:[
+    {label:'把他推下去挡电车',go:'push'},{label:'问他背包里装的什么',go:'ask'},{label:'什么都不做',go:'none'}]},
+  {t:'label',id:'push'},
+  {t:'do',fn:()=>{S.util+=1;hud();}},
+  {t:'say',who:'E',text:'（你伸出了手。）'},
+  {t:'say',who:'B',text:'等一下。拉杆你下得去手，推我就不行吧？手感不一样吧？'},
+  {t:'say',who:'E',text:'……确实不一样。'},
+  {t:'say',who:'B',text:'而且这个背包太重了，你推不动。算了，我自己想办法。'},
+  {t:'goto',id:'book'},
+  {t:'label',id:'ask'},
+  {t:'do',fn:()=>{S.third+=1;hud();}},
+  {t:'say',who:'B',text:'伦理学教科书。八百页。所以我才这么重。'},
+  {t:'say',who:'E',text:'要不……把书扔下去？'},
+  {t:'say',who:'B',text:'好主意，反正我也没读完。'},
+  {t:'goto',id:'book'},
+  {t:'label',id:'none'},
+  {t:'do',fn:()=>{S.deon+=1;hud();}},
+  {t:'say',who:'E',text:'（你什么都没做。）'},
+  {t:'trolleyGo'},
+  {t:'say',who:'F',text:'又是我们。下次能不能换个人？'},
+  {t:'goto',id:'after'},
+  {t:'label',id:'book'},
+  {t:'do',fn:()=>{S.book={x:.6,y:.5,vy:0,landed:false};sfx('pop');}},
+  {t:'wait',d:1.2},
+  {t:'trolleyGo'},
+  {t:'say',who:'N',text:'八百页的伦理学，挡住了电车。'},
+  {t:'say',who:'B',text:'哲学终于有用了一次。'},
+  {t:'label',id:'after'},
+  {t:'say',who:'H',text:'宙斯很满意。他说这一章可以写进教科书。'},
+
+  {t:'chapter',n:'第三章',title:'论文'},
+  {t:'scene',id:'net'},
+  {t:'say',who:'H',text:'哲学部升级了轨道。现在有三个道岔、四条轨道。'},
+  {t:'say',who:'H',text:'点圆圈切换道岔。亮起来的那条，就是电车会走的路线。'},
+  {t:'say',who:'H',text:'找好路线，再点“发车”。'},
+  {t:'net',mode:'static',rows:[3,0,5,2],speed:.16,hint:'点圆圈切换道岔，找一条能不撞到人的路线，然后点“发车”。'},
+  {t:'say',who:'H',text:()=>S.lastNetOk?'你找到了一条空轨道。原版思想实验里没有这个选项。':'……总之，原版思想实验里本来就没有空轨道。'},
+  {t:'say',who:'H',text:'宙斯说你钻空子。下一趟，电车已经出发了。'},
+  {t:'net',mode:'live',rows:[2,4,1,0],speed:.13,hint:'电车已经出发。道岔在电车经过之前都能扳。'},
+  {t:'say',who:'N',text:'消息传开了：被电车撞过的人，会被写进论文。'},
+  {t:'scene',id:'net'},
+  {t:'say',who:'V',text:'我们是论文志愿者！你指向哪条轨道，我们就跑去哪条！'},
+  {t:'say',who:'H',text:'他们会追着你指的路线跑。所以，最后一刻再扳。'},
+  {t:'net',mode:'rush',rows:[0,0,0,1],vol:{row:'r1',n:3},speed:.15,hint:'志愿者会跑到你指的轨道上。等电车快到道岔时再扳。'},
+  {t:'say',who:'V',text:()=>S.lastNetOk?'差一点就进论文了！':'我们进论文了！还是一作！'},
+
+  {t:'chapter',n:'第四章',title:'多轨漂移'},
+  {t:'scene',id:'run'},
+  {t:'say',who:'H',text:'宙斯在网上看到一张图。'},
+  {t:'say',who:'H',text:'一辆电车，前轮走左轨，后轮走右轨，两边一起撞。'},
+  {t:'say',who:'H',text:'他说，他想看这个。'},
+  {t:'say',who:'H',text:'这次你不扳道岔了。你来开车。'},
+  {t:'run',hint:'点电车上方换到上面的轨道，点下方换到下面的轨道。键盘 ↑ ↓ 也行。'},
+  {t:'say',who:'N',text:'前方，所有轨道汇成了一条。'},
+
+  {t:'chapter',n:'第五章',title:'环线'},
+  {t:'scene',id:'loop'},
+  {t:'say',who:'N',text:'这条轨道是一个圆。'},
+  {t:'say',who:'F',text:'我们又回来了。'},
+  {t:'say',who:'O',text:'一个都没少。'},
+  {t:'say',who:'B',text:'我的书呢？'},
+  {t:'say',who:'H',text:'我得告诉你一件事。'},
+  {t:'say',who:'H',text:'第一章那根扳道杆，从来没接到轨道上。'},
+  {t:'lever',hint:'拉一下试试。'},
+  {t:'say',who:'H',text:'道岔是我在下面跟着你的杆手动扳的。'},
+  {t:'say',who:'H',text:'所以严格来说，拉杆的人一直是我。'},
+  {t:'say',who:'H',text:'你所有的选择，都写进了一篇论文。题目叫《论扳道工》。'},
+  {t:'scene',id:'you'},
+  {t:'say',who:'N',text:'你发现自己站在一条轨道上。'},
+  {t:'say',who:'H',text:'现在，轮到别人考虑要不要拉了。'},
+  {t:'end'}
+];
+
+// ---------- state ----------
+const S={};
+function reset(mode){
+  Object.assign(S,{mode,si:-1,step:null,scene:'fork',G:GRAPHS.fork,sw:{A:0},locked:{},groups:[],tr:null,book:null,vol:null,run:null,
+    pins:[],popups:[],dust:[],bubble:null,heads:{},phase:0,util:0,deon:0,third:0,pulls:0,
+    wait:0,chapT:0,typing:false,tw:0,full:'',after:0,net:null,tries:{},lastNetOk:false,lever:0,leverTaps:0,loopT:0,shake:0,flash:0,
+    demoT:0});
+}
+function say(who,t,dur=1.9){S.bubble={who,t,life:dur};}
+
+// ---------- dialogue panel ----------
+function setHint(text){$('dlg').className='dlg hint';$('who').textContent='';$('txt').textContent=text||'';$('more').hidden=true;$('opts').hidden=true;S.typing=false;}
+function showLine(who,text){
+  $('dlg').className='dlg'+(who==='N'?' narr':'');$('opts').hidden=true;
+  const w=WHO[who];$('who').innerHTML=w[0]?`${w[0]}<small>${w[1]}</small>`:'';
+  S.full=text;S.tw=0;S.typing=!reduce;$('txt').textContent=reduce?text:'';$('more').hidden=S.typing;
+}
+function finishTyping(){S.typing=false;$('txt').textContent=S.full;$('more').hidden=S.step&&S.step.t==='choice';if(S.step&&S.step.t==='choice')$('opts').hidden=false;}
+function choose(i){
+  const s=S.step;if(!s||s.t!=='choice')return;ensureAudio();sfx('tick');
+  const lbl=s.options[i].go;go(SCRIPT.findIndex(x=>x.t==='label'&&x.id===lbl));
+}
+
+// ---------- scenes ----------
+function setScene(id){
+  S.scene=id;S.G=GRAPHS[id]||null;S.groups=[];S.tr=null;S.book=null;S.vol=null;S.run=null;S.pins=[];S.net=null;
+  if(id==='fork'){S.sw={A:0};S.locked={};}
+  if(id==='bridge'){S.groups=[{seg:'s0',x:.86,n:5,label:'五个人',who:'F'}];}
+  if(id==='net'){S.sw={A:0,B:0,C:0};S.locked={};}
+}
+
+// ---------- runner ----------
+const CH=SCRIPT.map((s,i)=>s.t==='chapter'?i:-1).filter(i=>i>=0);
+function go(i){
+  S.si=i;const s=SCRIPT[i];S.step=s;$('chapCard').hidden=true;$('opts').hidden=true;
+  switch(s.t){
+    case 'chapter':
+      $('chapN').textContent=s.n;$('chapT').textContent=s.title;$('chapCard').hidden=false;
+      $('chap').textContent=s.n+' · '+s.title;S.chapT=0;setHint('');sfx('gong');markSeen(i);break;
+    case 'scene':setScene(s.id);go(i+1);return;
+    case 'say':showLine(s.who,typeof s.text==='function'?s.text():s.text);break;
+    case 'do':s.fn();go(i+1);return;
+    case 'label':go(i+1);return;
+    case 'goto':go(SCRIPT.findIndex(x=>x.t==='label'&&x.id===s.id));return;
+    case 'wait':S.wait=s.d;setHint('');break;
+    case 'choice':
+      showLine(s.who,s.text);
+      $('opts').innerHTML=s.options.map((o,k)=>`<button type="button" data-k="${k}"><kbd>${k+1}</kbd>${o.label}</button>`).join('');
+      $('opts').hidden=S.typing;break;
+    case 'fork':
+      setHint(s.hint);S.sw={A:0};S.locked={};S.pins=[];
+      S.groups=s.groups.map(gr=>({...gr,x:.8,hit:false}));
+      S.tr={seg:'s0',t:0,speed:s.speed,delay:.8};S.after=0;break;
+    case 'trolleyIn':setHint('');S.tr={seg:'s0',t:0,speed:.14,delay:.2,stopX:.24,onStop:'next'};break;
+    case 'trolleyGo':setHint('');S.tr.stopped=false;S.tr.stopX=S.book?S.book.x-.035:null;S.tr.onStop='next';S.tr.onExit='next';sfx('bell');break;
+    case 'net':startNet(s);break;
+    case 'run':setHint(s.hint);startRun();break;
+    case 'lever':setHint(s.hint);S.leverTaps=0;break;
+    case 'end':
+      S.mode='end';setHint('');saveProgress(p=>{p.done=true;});
+      {const v=verdict();$('verdict').textContent=v[0];
+      $('endText').textContent=`你一共拉了 ${S.pulls} 次杆。宙斯的评语：${v[1]}论文已经投出去了。`;
+      $('ovEnd').hidden=false;$('btnAgain').focus();}break;
+  }
+  hud();
+}
+const next=()=>go(S.si+1);
+function verdict(){
+  const {util,deon,third}=S;
+  if(third>=util&&third>=deon&&third>0)return ['第三条路派扳道工','总在找别的办法，难以归类。'];
+  if(util>deon)return ['边沁派扳道工','会算账，下手快。'];
+  if(deon>util)return ['康德派扳道工','有原则，不轻易动手。'];
+  return ['骑墙派扳道工','这次拉，下次不拉，很难预测。'];
+}
+function hud(){
+  $('pulls').textContent=S.pulls;
+  const tot=S.util+S.deon+S.third;
+  const pos=tot?50+(S.deon-S.util)/tot*45:50;
+  $('marker').style.left=pos.toFixed(1)+'%';
+  $('mood').textContent=!tot?'还没表态':verdict()[0].replace('扳道工','');
+}
+
+// ---------- chapter 3: the switch network ----------
+function startNet(s){
+  S.G=GRAPHS.net;S.sw={A:0,B:0,C:0};S.locked={};S.pins=[];S.after=0;
+  S.tries[S.si]=S.tries[S.si]||0;
+  setHint(S.tries[S.si]?`撞到人了。电车又来了，再试一次。（${s.hint}）`:s.hint);
+  S.groups=s.rows.map((n,i)=>n?{seg:'r'+i,x:.74,n,hit:false,label:n+'人'}:null).filter(Boolean);
+  S.vol=s.vol?{row:s.vol.row,n:s.vol.n,to:null,from:null,t:0,wait:0,hit:false,frozen:false}:null;
+  S.net={mode:s.mode,speed:s.speed,started:s.mode!=='static'};
+  S.tr=s.mode==='static'?null:{seg:'s0',t:0,speed:s.speed,delay:1.4,onExit:'net'};
+  if(s.mode!=='static')sfx('bell');
+}
+function netDone(){
+  const hit=S.groups.some(gr=>gr.hit)||(S.vol&&S.vol.hit);
+  S.lastNetOk=!hit;
+  if(!hit){S.third+=1;hud();const p=pointAt(S.tr.seg,.6);S.popups.push({x:W*.62,y:p.y-g.R*2,t:'第三条路！',life:1.6,hot:true});sfx('ding');S.after=1.6;S.afterGo='next';}
+  else{S.tries[S.si]++;
+    if(S.tries[S.si]<3){S.after=1.8;S.afterGo='retry';}
+    else{S.after=1.6;S.afterGo='next';}}
+}
+function btnRect(){return {x:W*.04,y:g.gy-g.R*2.6,w:Math.max(84,W*.13),h:g.R*2.2};}
+function switches(){
+  return Object.entries(S.G).filter(([,v])=>v.sw).map(([id,v])=>{const p=v.pts[v.pts.length-1];return {id:v.sw,seg:id,x:p[0]*W,y:p[1]*H};});
+}
+function toggleSwitch(id){
+  if(S.locked[id])return;S.sw[id]^=1;S.pulls++;sfx('clack');hud();
+  if(S.vol)S.vol.wait=0;
+}
+function finalRow(){if(!S.tr)return routeFrom('s0').pop();return routeFrom(S.tr.seg).pop();}
+
+// ---------- chapter 4: the runner ----------
+const LANES=[.42,.6,.78];
+const PATTERN=[[1.2,[0]],[2.6,[2]],[4,[1]],[5.4,[0,1]],[6.8,[1,2]],[8.2,[0,2]],[9.4,[1]],[10.4,[0]],[11.4,[2]],[12.6,[0,1]],[13.6,[1,2]],[14.6,[0,1]],[15.8,[0,2]],[17,[1]]];
+function startRun(){S.run={t:0,lane:1,ly:1,obs:[],k:0,hits:0,dodges:0,driftShown:0,end:false,endT:0,scroll:0};}
+function laneChange(d){
+  const r=S.run;if(!r||r.end)return;const n=Math.max(0,Math.min(2,r.lane+d));if(n===r.lane)return;
+  r.lane=n;sfx('clack');
+  const tx=W*.22,ty=LANES[n]*H;burst(tx-g.R,ty,6);
+  if(r.driftShown<3){r.driftShown++;S.popups.push({x:tx+g.R*2,y:ty-g.R*2.4,t:'漂移！',life:.9,small:true});}
+}
+
+// ---------- input ----------
+function canvasPoint(e){if(!e||e.clientX==null)return null;const r=cvs.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top};}
+function tap(e){
+  if(S.mode!=='story')return;ensureAudio();
+  const s=S.step;if(!s)return;const p=canvasPoint(e);
+  if(s.t==='say'){if(S.typing)finishTyping();else{sfx('tick');next();}}
+  else if(s.t==='choice'){if(S.typing)finishTyping();}
+  else if(s.t==='chapter'){if(S.chapT>.5)next();}
+  else if(s.t==='fork'){if(S.tr&&!S.locked.A){S.sw.A^=1;S.pulls++;sfx('clack');hud();}}
+  else if(s.t==='net'){
+    if(!p){if(!S.net.started)launch();return;}
+    const b=btnRect();
+    if(!S.net.started&&p.x>=b.x&&p.x<=b.x+b.w&&p.y>=b.y&&p.y<=b.y+b.h){launch();return;}
+    let best=null,bd=g.R*2.4;
+    switches().forEach(w=>{const d=Math.hypot(w.x-p.x,w.y-p.y);if(d<bd){bd=d;best=w;}});
+    if(best)toggleSwitch(best.id);
+  }
+  else if(s.t==='run'){if(!p)return;const ty=lerp(LANES[0],LANES[2],S.run.ly/2)*H;laneChange(p.y<ty?-1:1);}
+  else if(s.t==='lever'){if(S.leverTaps>=3)return;S.lever^=1;S.leverTaps++;sfx('clack');
+    S.popups.push({x:W*.16,y:g.gy-g.R*4.5,t:'咔哒。',life:1,small:true});
+    if(S.leverTaps>=3){S.after=1;S.afterGo='next';}}
+}
+function launch(){if(S.net&&!S.net.started){S.net.started=true;S.tr={seg:'s0',t:0,speed:S.net.speed,delay:.1,onExit:'net'};sfx('bell');}}
+
+// ---------- update ----------
+function hitGroup(gr,px){
+  gr.hit=true;S.shake=reduce?0:.18;sfx('bump');
+  const y=gr.y!=null?gr.y*H:(S.scene==='net'&&ROWY[gr.seg]!=null?ROWY[gr.seg]*H:pointAt(gr.seg,.9).y);
+  for(let i=0;i<gr.n;i++){const x0=gr.x*W+(i-(gr.n-1)/2)*g.R*.8;
+    S.pins.push({x0,y0:y,dx:g.R*(3+Math.random()*4)*(Math.random()<.2?-1:1),dy:g.R*(.4+Math.random()*.8),t:0,dur:.8+Math.random()*.3,spins:1+Math.floor(Math.random()*2),life:3});}
+  S.popups.push({x:gr.x*W,y:y-g.R*3,t:'没事！思想实验！',life:1.3,small:true});
+}
+function updateTrolley(dt){
+  const tr=S.tr;if(!tr)return;
+  if(tr.delay>0){tr.delay-=dt;return;}
+  if(tr.stopped)return;
+  const len=segLen(tr.seg);tr.t+=tr.speed*W*dt/len;
+  while(tr.t>=1){
+    const sg=S.G[tr.seg];
+    if(sg.sw){S.locked[sg.sw]=true;const n=sg.opts[S.sw[sg.sw]];tr.t=(tr.t-1)*len/segLen(n);tr.seg=n;sfx('clack');}
+    else{tr.t=1;break;}
+  }
+  const p=pointAt(tr.seg,tr.t),front=p.x+g.R*1.7;
+  S.groups.forEach(gr=>{if(!gr.hit&&gr.seg===tr.seg&&front>=gr.x*W-g.R*.6)hitGroup(gr);});
+  if(S.vol&&!S.vol.hit&&!S.vol.to&&S.vol.row===tr.seg&&front>=.74*W-g.R*.6){S.vol.hit=true;hitGroup({seg:S.vol.row,x:.74,n:S.vol.n,hit:false});S.vol.gone=true;}
+  if(tr.stopX!=null&&front>=tr.stopX*W){tr.stopped=true;sfx('brake');if(tr.onStop==='next'){S.after=.6;S.afterGo='next';}return;}
+  if(p.x>W+g.R*4){
+    S.tr.done=true;const ex=tr.onExit;tr.onExit=null;tr.stopped=true;
+    if(S.step&&S.step.t==='fork')forkDone();
+    else if(ex==='net')netDone();
+    else if(ex==='next'){S.after=.6;S.afterGo='next';}
+  }
+}
+function forkDone(){
+  const s=S.step,hit=S.groups.find(gr=>gr.hit);
+  if(hit){if(hit.seg==='up')S.util++;else S.deon++;hud();const r=s.react[hit.seg];say(r[0],r[1],2.2);}
+  S.after=2.4;S.afterGo='next';
+}
+function update(dt){
+  S.phase+=dt;
+  const s=S.step;
+  if(S.mode==='story'&&s){
+    if(s.t==='chapter'){S.chapT+=dt;if(S.chapT>2.2)next();}
+    if(s.t==='wait'){S.wait-=dt;if(S.wait<=0)next();}
+  }
+  if(S.mode==='title')demo(dt);
+  if(S.after>0){S.after-=dt;if(S.after<=0){const a=S.afterGo;S.afterGo=null;if(a==='next')next();else if(a==='retry')go(S.si);}}
+  if(S.typing){S.tw+=dt*34;const n=Math.floor(S.tw);$('txt').textContent=S.full.slice(0,n);if(n>=S.full.length)finishTyping();}
+  updateTrolley(dt);
+  if(S.book&&!S.book.landed){S.book.vy+=2.6*dt;S.book.y+=S.book.vy*dt;const ty=.78-.012;if(S.book.y>=ty){S.book.y=ty;S.book.landed=true;burst(S.book.x*W,ty*H,10);sfx('bump');}}
+  // volunteers chase the route
+  if(S.vol&&!S.vol.gone){
+    const v=S.vol;
+    // once the trolley is past the last switch, it's too late: they stop wherever they are
+    if(S.tr&&/^r/.test(S.tr.seg)){if(!v.frozen&&v.to)S.popups.push({x:.74*W,y:lerp(ROWY[v.from],ROWY[v.to],v.t)*H-g.R*3,t:'来不及了！',life:1.2,small:true});v.frozen=true;}
+    if(v.to&&!v.frozen){v.t+=dt/1.5;if(v.t>=1){v.row=v.to;v.to=null;v.wait=0;}}
+    else if(!v.frozen){const tg=finalRow();if(tg!==v.row){v.wait+=dt;if(v.wait>.5){v.from=v.row;v.to=tg;v.t=0;v.row=null;sfx('tick');}}}
+  }
+  if(S.run)updateRun(dt);
+  if(S.scene==='loop')S.loopT+=dt;
+  if(S.bubble){S.bubble.life-=dt;if(S.bubble.life<=0)S.bubble=null;}
+  S.shake=Math.max(0,S.shake-dt);S.flash=Math.max(0,S.flash-dt);
+  S.pins.forEach(p=>{p.t=Math.min(1,p.t+dt/p.dur);if(p.t>=1)p.life-=dt;});S.pins=S.pins.filter(p=>p.life>0);
+  S.popups.forEach(p=>{p.life-=dt;p.y-=28*dt;});S.popups=S.popups.filter(p=>p.life>0);
+  S.dust.forEach(d=>{d.life-=dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.vy+=200*dt;});S.dust=S.dust.filter(d=>d.life>0);
+}
+function updateRun(dt){
+  const r=S.run;r.t+=dt;r.scroll+=dt*W*.32;
+  r.ly+=(r.lane-r.ly)*Math.min(1,dt*12);
+  while(r.k<PATTERN.length&&r.t>=PATTERN[r.k][0]){PATTERN[r.k][1].forEach(l=>r.obs.push({x:1.08,lane:l,hit:false,passed:false}));r.k++;}
+  const tx=.22;
+  r.obs.forEach(o=>{o.x-=.32*dt;
+    if(!o.hit&&!o.passed&&Math.abs(o.x-tx)<.03){if(Math.round(r.ly)===o.lane){o.hit=true;r.hits++;hitGroup({seg:null,x:o.x,n:2,hit:false,y:LANES[o.lane]});}}
+    if(!o.passed&&o.x<tx-.04){o.passed=true;if(!o.hit)r.dodges++;}});
+  r.obs=r.obs.filter(o=>o.x>-.1&&!o.hit);
+  if(!r.end&&r.k>=PATTERN.length&&r.obs.length===0){r.end=true;r.endT=0;}
+  if(r.end){r.endT+=dt;if(r.endT>2.4&&!r.fired){r.fired=true;S.after=.1;S.afterGo='next';}}
+}
+function burst(x,y,n){if(reduce)n=Math.ceil(n/3);
+  for(let i=0;i<n;i++){const a=-Math.PI*Math.random(),sp=40+Math.random()*110;S.dust.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:.5+Math.random()*.4,r:1.5+Math.random()*2.5});}}
+
+// title-screen demo: the fork, with the lever flipping on its own
+function demo(dt){
+  if(!S.tr){S.groups=[{seg:'main',x:.8,n:5,hit:false,label:'五个人'},{seg:'up',x:.8,n:1,hit:false,label:'一个人'}];S.sw.A=0;S.locked={};S.tr={seg:'s0',t:0,speed:.16,delay:.6};S.demoFlip=.3+Math.random()*.4;}
+  if(S.tr.seg==='s0'&&S.tr.t>S.demoFlip&&!S.demoDone){S.sw.A^=1;S.demoDone=true;}
+  if(S.tr.done){S.tr=null;S.demoDone=false;}
+}
+
+// ---------- draw ----------
+function meander(y,h){
+  const s=h,n=Math.ceil(W/s)+1;ctx.save();ctx.strokeStyle=C.ink;ctx.lineWidth=Math.max(2,h*.14);ctx.beginPath();
+  for(let i=0;i<n;i++){const x=i*s;ctx.moveTo(x,y+s);ctx.lineTo(x,y);ctx.lineTo(x+s*.8,y);ctx.lineTo(x+s*.8,y+s*.62);ctx.lineTo(x+s*.38,y+s*.62);ctx.lineTo(x+s*.38,y+s*.32);}
+  ctx.moveTo(0,y+s);ctx.lineTo(W,y+s);ctx.stroke();ctx.restore();
+}
+function backdrop(){
+  const grd=ctx.createRadialGradient(W*.5,H*.3,10,W*.5,H*.35,Math.max(W,H)*.85);
+  grd.addColorStop(0,C.light);grd.addColorStop(1,C.clay);ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);
+  meander(g.band*.5,g.band);
+  ctx.fillStyle=C.ink;ctx.fillRect(0,H-g.band*1.1,W,g.band*1.1);
+  ctx.strokeStyle=C.clay;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,H-g.band*.7);ctx.lineTo(W,H-g.band*.7);ctx.stroke();
+}
+function rail(pts,hi){
+  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+  // ties
+  ctx.strokeStyle=C.ink;ctx.lineWidth=2;
+  for(let i=1;i<pts.length;i++){const [x1,y1]=pts[i-1],[x2,y2]=pts[i],l=Math.hypot(x2-x1,y2-y1),a=Math.atan2(y2-y1,x2-x1);
+    const nx=-Math.sin(a)*5,ny=Math.cos(a)*5;
+    for(let d=6;d<l;d+=12){const x=x1+Math.cos(a)*d,y=y1+Math.sin(a)*d;ctx.beginPath();ctx.moveTo(x-nx,y-ny);ctx.lineTo(x+nx,y+ny);ctx.stroke();}}
+  ctx.lineWidth=3.5;ctx.strokeStyle=hi?C.bone:C.ink;ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.stroke();
+  ctx.restore();
+}
+function drawGraph(){
+  if(!S.G)return;
+  Object.keys(S.G).forEach(id=>rail(segPx(id),false));
+  // the lit route
+  if(S.scene==='net'||S.scene==='fork'){
+    const start=S.tr&&!S.tr.done?S.tr.seg:'s0',segs=routeFrom(start);
+    ctx.save();ctx.globalAlpha=S.scene==='net'?.95:.55;
+    segs.forEach((id,k)=>{let p=segPx(id);if(k===0&&S.tr&&!S.tr.done){const q=pointAt(id,S.tr.t);p=[[q.x,q.y],...p.filter(([x])=>x>q.x)];}
+      ctx.strokeStyle=C.bone;ctx.lineWidth=2;ctx.setLineDash([6,5]);ctx.beginPath();p.forEach(([x,y],i)=>i?ctx.lineTo(x,y-5):ctx.moveTo(x,y-5));ctx.stroke();});
+    ctx.restore();
+  }
+}
+function person(x,y,h,o={}){
+  ctx.save();ctx.translate(x,y);if(o.rot)ctx.rotate(o.rot);ctx.globalAlpha*=o.alpha==null?1:o.alpha;
+  ctx.strokeStyle=C.ink;ctx.fillStyle=C.ink;ctx.lineCap='round';ctx.lineWidth=h*.1;
+  const b=Math.sin(S.phase*6+x)*h*.02;
+  ctx.beginPath();ctx.moveTo(-h*.08,0);ctx.lineTo(0,-h*.45);ctx.lineTo(h*.08,0);ctx.stroke();
+  ctx.lineWidth=h*.15;ctx.beginPath();ctx.moveTo(0,-h*.45);ctx.lineTo(0,-h*.78+b);ctx.stroke();
+  ctx.lineWidth=h*.09;
+  if(o.cheer){ctx.beginPath();ctx.moveTo(0,-h*.74);ctx.lineTo(-h*.2,-h*1.02+Math.sin(S.phase*12)*h*.05);ctx.moveTo(0,-h*.74);ctx.lineTo(h*.2,-h*1.02-Math.sin(S.phase*12)*h*.05);ctx.stroke();}
+  else{ctx.beginPath();ctx.moveTo(0,-h*.74);ctx.lineTo(-h*.06,-h*.5);ctx.moveTo(0,-h*.74);ctx.lineTo(h*.06,-h*.5);ctx.stroke();}
+  ctx.beginPath();ctx.arc(0,-h*.9+b,h*.11,0,7);ctx.fill();
+  if(o.tied){ctx.strokeStyle=C.bone;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(-h*.12,-h*.6);ctx.lineTo(h*.12,-h*.66);ctx.moveTo(-h*.12,-h*.52);ctx.lineTo(h*.12,-h*.58);ctx.stroke();}
+  if(o.pack){ctx.fillStyle=C.ink;ctx.fillRect(-h*.38,-h*1.0,h*.3,h*.55);ctx.strokeStyle=C.clay;ctx.lineWidth=1.2;ctx.strokeRect(-h*.34,-h*.92,h*.22,h*.18);}
+  if(o.wreath){ctx.fillStyle=C.bone;for(let i=0;i<5;i++){const a=Math.PI*(1.1+i*.2);ctx.beginPath();ctx.ellipse(Math.cos(a)*h*.12,-h*.9+Math.sin(a)*h*.12,h*.045,h*.018,a+Math.PI/2,0,7);ctx.fill();}}
+  ctx.restore();
+}
+function sign(x,y,text,alpha=1){
+  ctx.save();ctx.globalAlpha=alpha;const fs=Math.max(10,Math.min(14,g.R*.55));ctx.font=`700 ${fs}px ${FONT}`;
+  const w=ctx.measureText(text).width+fs*.9,h=fs*1.6;
+  const bx=Math.max(4,Math.min(W-w-4,x-w/2));
+  ctx.fillStyle=C.bone;ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.fillRect(bx,y-h,w,h);ctx.strokeRect(bx,y-h,w,h);
+  ctx.fillStyle=C.ink;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,bx+w/2,y-h/2+1);ctx.restore();
+}
+function groupAt(gr,y,opts={}){
+  const h=g.R*1.7;
+  for(let i=0;i<gr.n;i++)person(gr.x*W+(i-(gr.n-1)/2)*g.R*.8,y,h,{tied:!opts.free,cheer:opts.cheer});
+  if(gr.label&&!opts.noSign)sign(gr.x*W,y-h*1.25,gr.label);
+  if(gr.who)S.heads[gr.who]={x:gr.x*W,y:y-h};
+}
+function trolley(x,y,a,opts={}){
+  const R=g.R;ctx.save();ctx.translate(x,y);ctx.rotate(opts.tilt!=null?opts.tilt:a);
+  ctx.fillStyle=C.ink;
+  const w=R*3.4,h=R*1.6;
+  ctx.beginPath();ctx.moveTo(-w/2,-R*.35);ctx.lineTo(-w/2,-R*.35-h);ctx.lineTo(w/2-R*.3,-R*.35-h);ctx.lineTo(w/2,-R*.35-h+R*.4);ctx.lineTo(w/2,-R*.35);ctx.closePath();ctx.fill();
+  ctx.fillStyle=C.bone;for(let i=0;i<3;i++)ctx.fillRect(-w/2+R*.35+i*R*.95,-R*.35-h+R*.3,R*.65,R*.55);
+  ctx.strokeStyle=C.ink;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-R*.3,-R*.35-h);ctx.lineTo(-R*.9,-R*.35-h-R*1.1);ctx.stroke();
+  ctx.fillStyle=C.ink;[-w*.3,w*.3].forEach(wx=>{ctx.beginPath();ctx.arc(wx,-R*.2,R*.32,0,7);ctx.fill();});
+  ctx.strokeStyle=C.clay;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(-w/2+R*.2,-R*.55);ctx.lineTo(w/2-R*.2,-R*.55);ctx.stroke();
+  ctx.restore();
+}
+function drawTrolley(){
+  const tr=S.tr;if(!tr)return;const p=pointAt(tr.seg,tr.t);
+  if(p.x<-g.R*4||p.x>W+g.R*4)return;
+  trolley(p.x,p.y,p.a);
+}
+function lever(x,y,state,big){
+  const R=g.R*(big?1.4:1);ctx.save();ctx.translate(x,y);
+  ctx.fillStyle=C.ink;ctx.fillRect(-R*.9,-R*.6,R*1.8,R*.6);
+  const a=state?.6:-.6;ctx.strokeStyle=C.ink;ctx.lineWidth=R*.28;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(0,-R*.5);ctx.lineTo(Math.sin(a)*R*2.2,-R*.5-Math.cos(a)*R*2.2);ctx.stroke();
+  ctx.fillStyle=C.bone;ctx.beginPath();ctx.arc(Math.sin(a)*R*2.2,-R*.5-Math.cos(a)*R*2.2,R*.38,0,7);ctx.fill();
+  ctx.strokeStyle=C.ink;ctx.lineWidth=2;ctx.stroke();
+  ctx.restore();
+}
+function drawPins(){
+  S.pins.forEach(p=>{const t=p.t,x=p.x0+p.dx*t,y=lerp(p.y0,p.y0+p.dy,t)-Math.sin(t*Math.PI)*g.R*3.5;
+    person(x,y,g.R*1.7,{rot:t*Math.PI*2*p.spins,alpha:Math.min(1,p.life)});});
+}
+
+function sceneFork(){
+  // ground strip
+  ctx.fillStyle=C.deep;ctx.fillRect(0,g.gy,W,H-g.gy);ctx.strokeStyle=C.ink;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,g.gy);ctx.lineTo(W,g.gy);ctx.stroke();
+  drawGraph();
+  S.groups.forEach(gr=>{if(!gr.hit)groupAt(gr,pointAt(gr.seg,.85).y,{});else if(gr.who)S.heads[gr.who]={x:gr.x*W,y:pointAt(gr.seg,.85).y-g.R*3};});
+  // switch point marker and lever
+  const sx=.36*W,sy=.72*H;ctx.fillStyle=S.locked.A?C.ink:C.gold;ctx.beginPath();ctx.arc(sx,sy,g.R*.35,0,7);ctx.fill();
+  lever(W*.27,g.gy,S.sw.A,false);
+  drawTrolley();drawPins();
+}
+function sceneBridge(){
+  ctx.fillStyle=C.deep;ctx.fillRect(0,g.gy,W,H-g.gy);ctx.strokeStyle=C.ink;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,g.gy);ctx.lineTo(W,g.gy);ctx.stroke();
+  drawGraph();
+  // footbridge
+  const bx0=W*.5,bx1=W*.7,by=H*.5;
+  ctx.fillStyle=C.ink;ctx.fillRect(bx0,by,bx1-bx0,g.R*.5);ctx.fillRect(bx0,by,g.R*.5,g.gy-by);ctx.fillRect(bx1-g.R*.5,by,g.R*.5,g.gy-by);
+  ctx.strokeStyle=C.ink;ctx.lineWidth=2;for(let x=bx0;x<=bx1;x+=g.R*.7){ctx.beginPath();ctx.moveTo(x,by);ctx.lineTo(x,by-g.R*1.1);ctx.stroke();}
+  ctx.beginPath();ctx.moveTo(bx0,by-g.R*1.1);ctx.lineTo(bx1,by-g.R*1.1);ctx.stroke();
+  person(W*.6,by,g.R*2,{pack:!S.book||!S.book.landed?true:false});S.heads.B={x:W*.6,y:by-g.R*2};
+  if(S.book){const x=S.book.x*W,y=S.book.y*H;ctx.save();ctx.translate(x,y);if(!S.book.landed)ctx.rotate(S.phase*8);
+    ctx.fillStyle=C.ink;ctx.fillRect(-g.R*.8,-g.R*.7,g.R*1.6,g.R*.7);ctx.fillStyle=C.bone;ctx.fillRect(-g.R*.7,-g.R*.6,g.R*1.4,g.R*.18);ctx.restore();
+    if(S.book.landed)sign(x,y-g.R*1.1,'伦理学·八百页');}
+  S.groups.forEach(gr=>{if(!gr.hit)groupAt(gr,.78*H,{});else S.heads.F={x:gr.x*W,y:.78*H-g.R*3};});
+  drawTrolley();drawPins();
+}
+function sceneNet(){
+  ctx.fillStyle=C.deep;ctx.fillRect(0,g.gy+g.R*.8,W,H-g.gy);
+  drawGraph();
+  S.groups.forEach(gr=>{if(!gr.hit)groupAt(gr,ROWY[gr.seg]*H,{noSign:true});
+    if(!gr.hit){const fs=Math.max(11,g.R*.6);ctx.save();ctx.font=`900 ${fs}px ${FONT}`;ctx.fillStyle=C.ink;ctx.textAlign='left';ctx.fillText(gr.n+'人',gr.x*W+gr.n*g.R*.4+g.R*.5,ROWY[gr.seg]*H-g.R*.4);ctx.restore();}});
+  // empty-row markers
+  ['r0','r1','r2','r3'].forEach(r=>{const occ=S.groups.some(gr=>gr.seg===r&&!gr.hit)||(S.vol&&!S.vol.gone&&(S.vol.row===r));
+    if(!occ){ctx.save();ctx.font=`700 ${Math.max(10,g.R*.5)}px ${FONT}`;ctx.fillStyle=C.ink;ctx.globalAlpha=.55;ctx.textAlign='left';ctx.fillText('空',.74*W,ROWY[r]*H-g.R*.5);ctx.restore();}});
+  if(S.vol&&!S.vol.gone){const v=S.vol;let y;
+    if(v.to){const a=ROWY[v.from]*H,b=ROWY[v.to]*H;y=lerp(a,b,v.t*v.t*(3-2*v.t));}else y=ROWY[v.row]*H;
+    const gr={x:.74,n:v.n,who:'V'};groupAt(gr,y,{free:true,cheer:true,noSign:true});sign(.74*W,y-g.R*2.1,'撞我！');}
+  else if(S.step&&S.step.t==='say'&&S.step.who==='V')S.heads.V={x:.74*W,y:.46*H-g.R*2};
+  // switches
+  switches().forEach(w=>{
+    const sg=S.G[w.seg],nx=S.G[sg.opts[S.sw[w.id]]].pts[1],tx=nx[0]*W,ty=nx[1]*H,a=Math.atan2(ty-w.y,tx-w.x),r=g.R*.95;
+    ctx.save();ctx.translate(w.x,w.y);
+    ctx.fillStyle=S.locked[w.id]?C.ink:C.bone;ctx.strokeStyle=C.ink;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fill();ctx.stroke();
+    ctx.rotate(a);ctx.strokeStyle=S.locked[w.id]?C.clay:C.ink;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-r*.45,0);ctx.lineTo(r*.45,0);ctx.moveTo(r*.1,-r*.35);ctx.lineTo(r*.48,0);ctx.lineTo(r*.1,r*.35);ctx.stroke();
+    ctx.restore();});
+  if(S.net&&!S.net.started){const b=btnRect();ctx.save();ctx.fillStyle=C.ink;ctx.fillRect(b.x,b.y,b.w,b.h);ctx.strokeStyle=C.bone;ctx.lineWidth=2;ctx.strokeRect(b.x+3,b.y+3,b.w-6,b.h-6);
+    ctx.fillStyle=C.bone;ctx.font=`900 ${Math.max(14,g.R*.8)}px ${FONT}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('发车',b.x+b.w/2,b.y+b.h/2+1);ctx.restore();}
+  drawTrolley();drawPins();
+}
+function sceneRun(){
+  const r=S.run;
+  ctx.fillStyle=C.deep;ctx.fillRect(0,H*.32,W,g.gy-H*.32+g.R);
+  // poles for speed
+  const off=r?r.scroll:S.phase*W*.3;
+  ctx.strokeStyle=C.ink;ctx.lineWidth=3;
+  for(let x=-(off%(W*.3));x<W;x+=W*.3){ctx.beginPath();ctx.moveTo(x,H*.32);ctx.lineTo(x,H*.16);ctx.stroke();ctx.beginPath();ctx.moveTo(x-10,H*.19);ctx.lineTo(x+10,H*.19);ctx.stroke();}
+  ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(0,H*.2);ctx.lineTo(W,H*.2);ctx.stroke();
+  LANES.forEach(ly=>{const y=ly*H;ctx.strokeStyle=C.ink;ctx.lineWidth=2;
+    for(let x=-(off%14);x<W;x+=14){ctx.beginPath();ctx.moveTo(x,y-5);ctx.lineTo(x,y+5);ctx.stroke();}
+    ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();});
+  if(r){
+    r.obs.forEach(o=>groupAt({x:o.x,n:2},LANES[o.lane]*H,{noSign:true}));
+    const y=lerp(LANES[0],LANES[2],r.ly/2)*H,tilt=(r.lane-r.ly)*.5;
+    trolley(.22*W,y,0,{tilt});
+    if(Math.abs(r.lane-r.ly)>.05&&!reduce){ctx.fillStyle=C.gold;for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(.22*W-g.R*1.6-Math.random()*g.R,y-Math.random()*4,1.6,0,7);ctx.fill();}}
+    if(r.end){const a=Math.min(1,r.endT/1);sign(W*.7,H*.3,'前方：环线',a);}
+  }
+  drawPins();
+}
+function sceneLoop(){
+  ctx.fillStyle=C.deep;ctx.fillRect(0,g.gy,W,H-g.gy);
+  const cx=W*.55,cy=H*.55,rx=Math.min(W*.36,H*.75),ry=H*.24;
+  ctx.strokeStyle=C.ink;ctx.lineWidth=2;
+  for(let a=0;a<Math.PI*2;a+=.09){const x=cx+Math.cos(a)*rx,y=cy+Math.sin(a)*ry;ctx.beginPath();ctx.moveTo(x-Math.cos(a)*5,y-Math.sin(a)*5);ctx.lineTo(x+Math.cos(a)*5,y+Math.sin(a)*5);ctx.stroke();}
+  ctx.lineWidth=3.5;ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,7);ctx.stroke();
+  const h=g.R*1.7;
+  [{x:cx-rx*.45,n:5,who:'F',label:'五个人'},{x:cx+rx*.05,n:1,who:'O',label:'一个人'},{x:cx+rx*.4,n:3,who:'V',label:'论文志愿者'}].forEach(gr=>{
+    for(let i=0;i<gr.n;i++)person(gr.x+(i-(gr.n-1)/2)*g.R*.8,cy+g.R*.6,h,{});
+    sign(gr.x,cy+g.R*.6-h*1.25,gr.label);S.heads[gr.who]={x:gr.x,y:cy-h*.5};});
+  person(cx-rx*.05,cy-ry*.35,h,{pack:false});S.heads.B={x:cx-rx*.05,y:cy-ry*.35-h};
+  const a=S.loopT*.7,tx=cx+Math.cos(a)*rx,ty=cy+Math.sin(a)*ry;
+  trolley(tx,ty,Math.atan2(Math.cos(a)*ry,-Math.sin(a)*rx));
+  lever(W*.14,g.gy,S.lever,true);
+  ctx.save();ctx.strokeStyle=C.ink;ctx.setLineDash([3,4]);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(W*.14+g.R*1.3,g.gy-g.R*.3);ctx.lineTo(W*.22,g.gy-g.R*.3);ctx.stroke();ctx.restore();
+  ctx.save();ctx.font=`700 ${Math.max(10,g.R*.5)}px ${FONT}`;ctx.fillStyle=C.ink;ctx.textAlign='left';ctx.fillText('（没接上）',W*.22+4,g.gy-g.R*.1);ctx.restore();
+}
+function sceneYou(){
+  ctx.fillStyle=C.deep;ctx.fillRect(0,g.gy,W,H-g.gy);
+  const y=H*.78;rail([[-10,y],[W+10,y]],false);
+  person(W*.58,y,g.R*2.4,{tied:true,wreath:true});S.heads.E={x:W*.58,y:y-g.R*2.4};
+  const tx=W*.1+Math.min(W*.08,S.phase*3);trolley(tx,y,0);
+  // a giant lever coming down from the sky, with a hand on it
+  const lx=W*.84,ly=g.band*2.2;
+  ctx.save();ctx.strokeStyle=C.ink;ctx.fillStyle=C.ink;ctx.lineCap='round';ctx.lineWidth=g.R*.6;
+  ctx.fillRect(lx-g.R*1.5,ly,g.R*3,g.R*.9);
+  const a=Math.PI+.5+Math.sin(S.phase*.8)*.06;ctx.beginPath();ctx.moveTo(lx,ly+g.R*.9);ctx.lineTo(lx+Math.sin(a)*g.R*5,ly+g.R*.9-Math.cos(a)*g.R*5);ctx.stroke();
+  const hx=lx+Math.sin(a)*g.R*5,hy=ly+g.R*.9-Math.cos(a)*g.R*5;
+  ctx.beginPath();ctx.ellipse(hx,hy,g.R*.9,g.R*.7,.3,0,7);ctx.fill();
+  ctx.lineWidth=g.R*.9;ctx.beginPath();ctx.moveTo(hx+g.R*.4,hy-g.R*.3);ctx.lineTo(W+20,hy-g.R*2.4);ctx.stroke();
+  ctx.restore();
+}
+function bubble(){
+  const b=S.bubble;if(!b)return;const hd=S.heads[b.who];if(!hd)return;
+  const fs=Math.max(12,Math.min(16,g.R*.65));
+  ctx.save();ctx.font=`700 ${fs}px ${FONT}`;
+  const tw=ctx.measureText(b.t).width,pw=tw+fs*1.1,ph=fs*1.9;
+  let x=hd.x-pw*.5,y=hd.y-g.R*1.6-ph;
+  x=Math.max(6,Math.min(W-pw-6,x));y=Math.max(g.band*2+4,y);
+  ctx.globalAlpha=Math.min(1,b.life*4);
+  ctx.fillStyle=C.bone;ctx.strokeStyle=C.ink;ctx.lineWidth=2;
+  ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,pw,ph,6):ctx.rect(x,y,pw,ph);ctx.fill();ctx.stroke();
+  const tx=Math.max(x+8,Math.min(x+pw-18,hd.x-5));
+  ctx.beginPath();ctx.moveTo(tx,y+ph-1);ctx.lineTo(tx+10,y+ph-1);ctx.lineTo(hd.x,hd.y-g.R*.4);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(tx,y+ph);ctx.lineTo(hd.x,hd.y-g.R*.4);ctx.lineTo(tx+10,y+ph);ctx.stroke();
+  ctx.fillStyle=C.ink;ctx.textBaseline='middle';ctx.textAlign='left';ctx.fillText(b.t,x+fs*.55,y+ph/2+1);
+  ctx.restore();
+}
+function overlays(){
+  S.dust.forEach(d=>{ctx.globalAlpha=Math.min(1,d.life*2);ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,7);ctx.fill();});ctx.globalAlpha=1;
+  S.popups.forEach(p=>{ctx.save();ctx.globalAlpha=Math.min(1,p.life*2);
+    const fs=Math.max(p.small?11:13,g.R*(p.hot?.8:p.small?.5:.65));ctx.font=`900 ${fs}px ${FONT}`;ctx.textAlign='center';
+    const tw=ctx.measureText(p.t).width/2+8,x=Math.max(tw,Math.min(W-tw,p.x));
+    ctx.lineWidth=p.small?3:4;ctx.strokeStyle=C.ink;ctx.strokeText(p.t,x,p.y);ctx.fillStyle=p.hot?C.gold:C.bone;ctx.fillText(p.t,x,p.y);ctx.restore();});
+}
+function draw(){
+  if(!W||!H)return;
+  ctx.save();if(S.shake>0){const k=S.shake*24;ctx.translate((Math.random()-.5)*k,(Math.random()-.5)*k);}
+  backdrop();
+  const sc=S.scene;
+  if(sc==='fork')sceneFork();else if(sc==='bridge')sceneBridge();else if(sc==='net')sceneNet();
+  else if(sc==='run')sceneRun();else if(sc==='loop')sceneLoop();else if(sc==='you')sceneYou();
+  overlays();bubble();ctx.restore();
+}
+
+// ---------- sound ----------
+let ac=null,sound=true;
+try{sound=localStorage.getItem('gods-sound')!=='0'}catch(e){}
+function syncSound(){$('btnSound').textContent='声音：'+(sound?'开':'关');$('btnSound').setAttribute('aria-pressed',sound);}
+syncSound();
+function tone(type,freqs,step,vol,len){
+  const t=ac.currentTime,o=ac.createOscillator(),gn=ac.createGain();o.type=type;o.connect(gn);gn.connect(ac.destination);
+  freqs.forEach((f,i)=>o.frequency.setValueAtTime(f,t+i*step));gn.gain.setValueAtTime(vol,t);gn.gain.exponentialRampToValueAtTime(.001,t+len);o.start(t);o.stop(t+len+.02);return o;
+}
+function sfx(k){
+  if(!sound||!ac)return;const t=ac.currentTime;
+  if(k==='clack')tone('square',[220,160],.04,.05,.09);
+  else if(k==='bell')tone('triangle',[1320,1320,0,1320],.12,.08,.5);
+  else if(k==='bump'){const o=tone('triangle',[160],0,.3,.2);o.frequency.exponentialRampToValueAtTime(60,t+.18);}
+  else if(k==='brake'){const o=tone('sawtooth',[900],0,.04,.4);o.frequency.exponentialRampToValueAtTime(400,t+.4);}
+  else if(k==='gong'){const o=tone('sine',[110],0,.22,1.4);o.frequency.exponentialRampToValueAtTime(98,t+1.2);}
+  else if(k==='ding')tone('sine',[660,880,990],.1,.1,.6);
+  else if(k==='pop')tone('square',[520,780],.06,.06,.16);
+  else if(k==='tick')tone('triangle',[880],0,.04,.05);
+}
+function ensureAudio(){if(!sound)return;if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(ac&&ac.state==='suspended')ac.resume();}
+
+// ---------- chapters, progress, deep links ----------
+const EP_ID='trolley';
+function saveProgress(fn){try{const all=JSON.parse(localStorage.getItem('gods-progress')||'{}')||{};const p=all[EP_ID]||(all[EP_ID]={seen:[]});fn(p);localStorage.setItem('gods-progress',JSON.stringify(all));}catch(e){}}
+function markSeen(i){const n=CH.indexOf(i)+1;if(n>0)saveProgress(p=>{if(!p.seen.includes(n))p.seen.push(n);});}
+function startAt(n){
+  const target=CH[Math.max(0,Math.min(CH.length-1,n-1))];
+  ensureAudio();$('ovTitle').hidden=true;$('ovEnd').hidden=true;
+  reset('story');setScene('fork');
+  for(let i=0;i<target;i++){const s=SCRIPT[i];if(s.t==='scene')setScene(s.id);}
+  go(target);
+}
+const chFromHash=()=>{const m=/^#ch(\d+)$/.exec(location.hash);return m?+m[1]:0;};
+addEventListener('hashchange',()=>{const n=chFromHash();if(n)startAt(n);});
+
+// ---------- input wiring ----------
+$('btnStart').addEventListener('click',e=>{e.stopPropagation();startAt(1);});
+$('btnAgain').addEventListener('click',e=>{e.stopPropagation();startAt(1);});
+$('btnSound').addEventListener('click',()=>{sound=!sound;try{localStorage.setItem('gods-sound',sound?'1':'0')}catch(e){}syncSound();if(sound)ensureAudio();});
+$('opts').addEventListener('pointerdown',e=>e.stopPropagation());
+$('opts').addEventListener('click',e=>{const b=e.target.closest('button');if(b)choose(+b.dataset.k);});
+document.querySelectorAll('.card').forEach(c=>c.addEventListener('pointerdown',e=>e.stopPropagation()));
+cvs.addEventListener('pointerdown',e=>{e.preventDefault();tap(e);});
+$('chapCard').addEventListener('pointerdown',e=>{e.preventDefault();tap(e);});
+$('dlg').addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;e.preventDefault();tap(null);});
+addEventListener('keydown',e=>{
+  if(S.mode!=='story'||e.target instanceof HTMLButtonElement||e.target instanceof HTMLAnchorElement)return;
+  const s=S.step;if(!s)return;
+  if(s.t==='choice'&&/^Digit[1-3]$/.test(e.code)){choose(+e.code.slice(5)-1);return;}
+  if(s.t==='net'&&/^Digit[1-3]$/.test(e.code)){toggleSwitch('ABC'[+e.code.slice(5)-1]);return;}
+  if(s.t==='run'&&(e.code==='ArrowUp'||e.code==='ArrowDown')){e.preventDefault();laneChange(e.code==='ArrowUp'?-1:1);return;}
+  if(e.code==='Space'||e.code==='Enter'){e.preventDefault();tap(null);}
+});
+
+// ---------- loop ----------
+resize();reset('title');hud();
+if(chFromHash())startAt(chFromHash());
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(W>0){update(dt);draw();}requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
