@@ -74,6 +74,10 @@ button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .foot{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;opacity:.85;flex-wrap:wrap}
 .foot button{font-family:var(--body);font-size:12px;letter-spacing:.06em;padding:4px 10px;background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
 .foot button:hover{background:var(--clay-light)}
+.foot .meta{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.back{color:var(--ink);font-weight:700;text-decoration:none;border-bottom:1.5px solid var(--ink);letter-spacing:.06em}
+.back:hover{color:var(--bone);border-color:var(--bone)}
+.back:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 @media (max-width:480px){.stat b{font-size:18px}.hud{gap:12px}.dlg{min-height:96px}}
 @media (prefers-reduced-motion:reduce){.chapcard,.dlg .more{animation:none}.scale i{transition:none}}
 </style>
@@ -106,7 +110,7 @@ button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
         <h2>完</h2>
         <p id="endText"></p>
         <p class="q">我们必须想象诸神也是幸福的。</p>
-        <div class="row"><button id="btnAgain">从头再来</button><a class="btn" href="https://sunnyyan991.github.io/Sisyphus/prometheus/">下一份差事</a></div>
+        <div class="row"><button id="btnAgain">从头再来</button><a class="btn" href="../prometheus/index.html#ch1">下一份差事</a></div>
       </div>
     </div>
   </div>
@@ -118,7 +122,7 @@ button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
   </div>
 
   <div class="foot">
-    <span>灵感来自希腊神话与加缪《西西弗斯神话》。</span>
+    <span class="meta"><a class="back" href="../index.html">← 主界面</a><span>灵感来自希腊神话与加缪《西西弗斯神话》。</span></span>
     <button id="btnSound" type="button" aria-pressed="true">声音：开</button>
   </div>
 </div>
@@ -261,7 +265,7 @@ function go(i){
   switch(s.t){
     case 'chapter':
       $('chapN').textContent=s.n;$('chapT').textContent=s.title;$('chapCard').hidden=false;
-      $('chap').textContent=s.n+' · '+s.title;S.chapT=0;setHint('');sfx('gong');break;
+      $('chap').textContent=s.n+' · '+s.title;S.chapT=0;setHint('');sfx('gong');markSeen(i);break;
     case 'say':showLine(s.who,typeof s.text==='function'?s.text():s.text);break;
     case 'do':s.fn();go(i+1);return;
     case 'wait':S.wait=s.d;setHint('');break;
@@ -269,7 +273,7 @@ function go(i){
     case 'strike':setHint(s.hint);S.st='strike';S.sign=true;S.strikeT=0;S.strikeTaps=0;S.strikeEnd=0;say('罢工中。',2.2);break;
     case 'finale':setHint(s.hint);S.left=s.n;S.ri=0;S.lines=s.lines;S.st='fpush';break;
     case 'end':
-      S.mode='end';setHint('');
+      S.mode='end';setHint('');saveProgress(p=>{p.done=true;});
       $('endText').textContent=`你在踹石神任上踹了 ${S.kicks} 脚，绩效 ${S.score}。现在，你也有了一块自己的石头。`;
       setTimeout(()=>{$('ovEnd').hidden=false;$('btnAgain').focus();},600);
       break;
@@ -697,8 +701,30 @@ addEventListener('keydown',e=>{
   if((e.code==='Space'||e.code==='Enter')&&S.mode==='story'&&!(e.target instanceof HTMLButtonElement)){e.preventDefault();tap();}
 });
 
+const EP_ID='sisyphus';
+function skipFix(target,rounds){
+  if(S.book){S.book.y=g.yb;S.book.landed=true;}
+  S.pushTime=Math.max(2.4,5.6*Math.pow(.95,rounds));
+}
+// ---------- chapters, progress, deep links ----------
+const CH=SCRIPT.map((s,i)=>s.t==='chapter'?i:-1).filter(i=>i>=0);
+function saveProgress(fn){try{const all=JSON.parse(localStorage.getItem('gods-progress')||'{}')||{};const p=all[EP_ID]||(all[EP_ID]={seen:[]});fn(p);localStorage.setItem('gods-progress',JSON.stringify(all));}catch(e){}}
+function markSeen(i){const n=CH.indexOf(i)+1;if(n>0)saveProgress(p=>{if(!p.seen.includes(n))p.seen.push(n);});}
+function startAt(n){
+  const target=CH[Math.max(0,Math.min(CH.length-1,n-1))];
+  ensureAudio();$('ovTitle').hidden=true;$('ovEnd').hidden=true;document.body.classList.remove('quiet');
+  reset('story');S.st='idle';
+  let rounds=0;
+  for(let i=0;i<target;i++){const s=SCRIPT[i];if(s.t==='do')s.fn();if(s.t==='play'||s.t==='finale')rounds+=s.n;}
+  skipFix(target,rounds);S.dust=[];S.bubble=null;S.popups=[];
+  go(target);
+}
+const chFromHash=()=>{const m=/^#ch(\d+)$/.exec(location.hash);return m?+m[1]:0;};
+addEventListener('hashchange',()=>{const n=chFromHash();if(n)startAt(n);});
+
 // ---------- loop ----------
 resize();reset('title');say('嘿咻。',1.5);
+if(chFromHash())startAt(chFromHash());
 let last=performance.now();
 function loop(now){
   const dt=Math.min(.05,(now-last)/1000);last=now;
