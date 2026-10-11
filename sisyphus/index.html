@@ -265,7 +265,7 @@ function go(i){
   switch(s.t){
     case 'chapter':
       $('chapN').textContent=s.n;$('chapT').textContent=s.title;$('chapCard').hidden=false;
-      $('chap').textContent=s.n+' · '+s.title;S.chapT=0;setHint('');sfx('gong');markSeen(i);break;
+      $('chap').textContent=s.n+' · '+s.title;S.chapT=0;setHint('');sfx('gong');markSeen(i);S.popups=[];S.bubble=null;break;
     case 'say':showLine(s.who,typeof s.text==='function'?s.text():s.text);break;
     case 'do':s.fn();go(i+1);return;
     case 'wait':S.wait=s.d;setHint('');break;
@@ -275,7 +275,7 @@ function go(i){
     case 'end':
       S.mode='end';setHint('');saveProgress(p=>{p.done=true;});
       $('endText').textContent=`你在踹石神任上踹了 ${S.kicks} 脚，绩效 ${S.score}。现在，你也有了一块自己的石头。`;
-      setTimeout(()=>{$('ovEnd').hidden=false;$('btnAgain').focus();},600);
+      setTimeout(()=>{$('ovEnd').hidden=false;},600);
       break;
   }
   hud();

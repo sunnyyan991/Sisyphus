@@ -155,22 +155,18 @@ const WHO={
 };
 const SCRIPT=[
   {t:'chapter',n:'序章',title:'轮岗'},
-  {t:'say',who:'H',text:'推石头的工作还顺利吗？'},
-  {t:'say',who:'H',text:'不重要。你又被调岗了。'},
+  {t:'say',who:'H',text:'推石头的工作还顺利吗？不重要，你又被调岗了。'},
   {t:'say',who:'H',text:'宙斯的鹰辞职了，说是工伤。这个岗位现在外包，由你顶班。'},
   {t:'do',fn:()=>{S.eagleOn=true;const e=eaglePerch();burst(e.x,e.y,10);sfx('pop');}},
   {t:'say',who:'N',text:'你穿上了鹰的制服。尺码偏小。'},
   {t:'say',who:'H',text:'关于这份工作，有四种说法。'},
   {t:'say',who:'P',text:'四种？明明是一件事的四个阶段。'},
   {t:'say',who:'H',text:'翻译问题。'},
-  {t:'say',who:'H',text:'先从第一种开始吧。'},
 
   {t:'chapter',n:'传说之一',title:'锁链'},
   {t:'say',who:'N',text:'他把火偷给了人类，被锁在高加索山的悬崖上。'},
-  {t:'say',who:'H',text:'他的肝会一直长回来。长满了，你就去啄一口。'},
-  {t:'say',who:'H',text:'点屏幕就是一口。别啄早了，也别放到过期。'},
-  {t:'say',who:'P',text:'你好，新来的鹰。我叫普罗米修斯，意思是“先见之明”。'},
-  {t:'say',who:'P',text:'你每一口怎么啄，我都会提前告诉你。'},
+  {t:'say',who:'H',text:'他的肝会一直长回来。长满了就啄一口，别啄早了，也别放到过期。'},
+  {t:'say',who:'P',text:'你好，新来的鹰。我叫普罗米修斯，意思是“先见之明”。你每一口怎么啄，我都会提前告诉你。'},
   {t:'play',n:3,grow:3.4,hint:'等肝长满再啄。他会预言你怎么啄，你可以不听他的。',
     prophecy:[{say:'这一口，你会等它长满。',expect:'full'},{say:'这一口，你会忍不住，啄早了。',expect:'early'},{say:'这一口……你会让它放过期。',expect:'late'}]},
   {t:'say',who:'P',text:()=>S.prophHits>=2?'看吧，先见之明。我只是没预见到你穿的是中号。':'……我的先见之明可能需要保养了。'},
@@ -188,9 +184,7 @@ const SCRIPT=[
   {t:'chapter',n:'传说之三',title:'遗忘'},
   {t:'say',who:'N',text:'几千年过去了。'},
   {t:'do',fn:()=>{S.forget=true;S.fog=.12;hud();}},
-  {t:'say',who:'H',text:'我来是想说……'},
-  {t:'say',who:'H',text:'……'},
-  {t:'say',who:'H',text:'算了，想起来再说。'},
+  {t:'say',who:'H',text:'我来是想说……算了，想起来再说。'},
   {t:'say',who:'N',text:'一个举着火把的人类路过。'},
   {t:'do',fn:()=>{S.human={x:-g.R*3,target:W*.34,walk:0};}},
   {t:'wait',d:2.2},
@@ -198,8 +192,7 @@ const SCRIPT=[
   {t:'say',who:'E',text:'他……为你们偷了火。'},
   {t:'say',who:'M',text:'火？我们一直都有啊。'},
   {t:'do',fn:()=>{S.human.target=-g.R*4;}},
-  {t:'say',who:'P',text:'刚才那是谁？'},
-  {t:'say',who:'P',text:'还有……我是谁？'},
+  {t:'say',who:'P',text:'刚才那是谁？还有……我是谁？'},
   {t:'say',who:'E',text:'……我好像是一只鹰？'},
   {t:'play',n:2,grow:3.6,hint:'你好像是来干什么的。点一下试试。',
     lines:{start:['……','你是来干什么的？'],pecked:['哦，对，是这个。','你为什么要啄我？……算了，不重要。']}},
@@ -249,7 +242,7 @@ function go(i){
   switch(s.t){
     case 'chapter':
       $('chapN').textContent=s.n;$('chapT').textContent=s.title;$('chapCard').hidden=false;
-      S.chapName=s.n+' · '+s.title;S.chapT=0;setHint('');sfx('gong');markSeen(i);break;
+      S.chapName=s.n+' · '+s.title;S.chapT=0;setHint('');sfx('gong');markSeen(i);S.popups=[];S.bubble=null;break;
     case 'say':showLine(s.who,typeof s.text==='function'?s.text():s.text);break;
     case 'do':s.fn();go(i+1);return;
     case 'wait':S.wait=s.d;setHint('');break;
@@ -260,7 +253,7 @@ function go(i){
     case 'end':
       S.mode='end';saveProgress(p=>{p.done=true;});
       $('endText').textContent=`第二份差事结束。你啄了 ${S.pecks} 口，其中新鲜的 ${S.fresh} 口。这些数字已经没有人记得了。`;
-      $('ovEnd').hidden=false;$('btnAgain').focus();break;
+      $('ovEnd').hidden=false;break;
   }
   hud();
 }
@@ -280,7 +273,8 @@ function hud(){
 function startRound(){
   S.st='grow';S.g=0;S.over=0;S.overWarned=false;
   if(S.mode!=='story')return;
-  if(S.prophecy){S.curProph=S.prophecy[S.ri%S.prophecy.length];say('P',S.curProph.say,2.8);}
+  if(S.prophecy){S.curProph=S.prophecy[S.ri%S.prophecy.length];say('P',S.curProph.say,2.8);
+    $('dlg').className='dlg';$('who').innerHTML='普罗米修斯<small>预言</small>';$('txt').textContent=S.curProph.say+'（你可以不照他说的来。）';$('more').hidden=true;}
   else if(S.lines&&S.lines.start)say('P',S.lines.start[S.ri%S.lines.start.length],1.6);
 }
 function requestPeck(){

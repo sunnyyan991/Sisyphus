@@ -174,11 +174,9 @@ const WHO={H:['赫尔墨斯','哲学部（借调）'],E:['你','扳道工'],F:['
 const SCRIPT=[
   {t:'chapter',n:'序章',title:'调岗'},
   {t:'scene',id:'fork'},
-  {t:'say',who:'H',text:'啄肝的岗位撤编了。肝……长不动了。'},
-  {t:'say',who:'H',text:'你被借调到哲学部。'},
+  {t:'say',who:'H',text:'啄肝的岗位撤编了，肝长不动了。你被借调到哲学部。'},
   {t:'say',who:'H',text:'别紧张。这里都是思想实验，没人会真的受伤。最多飞一下。'},
-  {t:'say',who:'N',text:'你领到了一根扳道杆。'},
-  {t:'say',who:'H',text:'你的新岗位：扳道工。'},
+  {t:'say',who:'N',text:'你领到了一根扳道杆。你的新岗位：扳道工。'},
 
   {t:'chapter',n:'第一章',title:'标准版'},
   {t:'say',who:'H',text:'电车要开过来了。主轨上有五个人，岔道上有一个人。'},
@@ -195,8 +193,8 @@ const SCRIPT=[
   {t:'say',who:'H',text:()=>S.util>S.deon?'你拉杆了。宙斯说，你是个算账的人。':S.deon>S.util?'你没拉杆。宙斯说，你是个讲原则的人。':'一次拉，一次没拉。宙斯说，你是个摇摆的人。'},
   {t:'say',who:'H',text:'他还说，这叫数据。'},
 
-  {t:'chapter',n:'第二章',title:'天桥'},
   {t:'scene',id:'bridge'},
+  {t:'chapter',n:'第二章',title:'天桥'},
   {t:'say',who:'H',text:'这一趟没有道岔。'},
   {t:'trolleyIn'},
   {t:'say',who:'N',text:'电车停在远处，等你想清楚。天桥上站着一个背着巨大背包的人。'},
@@ -230,11 +228,10 @@ const SCRIPT=[
   {t:'label',id:'after'},
   {t:'say',who:'H',text:'宙斯很满意。他说这一章可以写进教科书。'},
 
-  {t:'chapter',n:'第三章',title:'论文'},
   {t:'scene',id:'net'},
+  {t:'chapter',n:'第三章',title:'论文'},
   {t:'say',who:'H',text:'哲学部升级了轨道。现在有三个道岔、四条轨道。'},
   {t:'say',who:'H',text:'点圆圈切换道岔。亮起来的那条，就是电车会走的路线。'},
-  {t:'say',who:'H',text:'找好路线，再点“发车”。'},
   {t:'net',mode:'static',rows:[3,0,5,2],speed:.16,hint:'点圆圈切换道岔，找一条能不撞到人的路线，然后点“发车”。'},
   {t:'say',who:'H',text:()=>S.lastNetOk?'你找到了一条空轨道。原版思想实验里没有这个选项。':'……总之，原版思想实验里本来就没有空轨道。'},
   {t:'say',who:'H',text:'宙斯说你钻空子。下一趟，电车已经出发了。'},
@@ -246,26 +243,25 @@ const SCRIPT=[
   {t:'net',mode:'rush',rows:[0,0,0,1],vol:{row:'r1',n:3},speed:.15,hint:'志愿者会跑到你指的轨道上。等电车快到道岔时再扳。'},
   {t:'say',who:'V',text:()=>S.lastNetOk?'差一点就进论文了！':'我们进论文了！还是一作！'},
 
-  {t:'chapter',n:'第四章',title:'多轨漂移'},
   {t:'scene',id:'run'},
+  {t:'chapter',n:'第四章',title:'多轨漂移'},
   {t:'say',who:'H',text:'宙斯在网上看到一张图。'},
   {t:'say',who:'H',text:'一辆电车，前轮走左轨，后轮走右轨，两边一起撞。'},
   {t:'say',who:'H',text:'他说，他想看这个。'},
   {t:'say',who:'H',text:'这次你不扳道岔了。你来开车。'},
   {t:'run',hint:'点电车上方换到上面的轨道，点下方换到下面的轨道。键盘 ↑ ↓ 也行。'},
   {t:'say',who:'N',text:'前方，所有轨道汇成了一条。'},
+  {t:'say',who:'H',text:()=>{const r=S.runStats||{hits:0,dodges:0};return `你躲开了 ${r.dodges} 组人，撞到 ${r.hits} 组。`+(r.hits?'被撞到的说，被漂移撞到很光荣。':'宙斯说，一个都没撞到，不够刺激。');}},
 
-  {t:'chapter',n:'第五章',title:'环线'},
   {t:'scene',id:'loop'},
+  {t:'chapter',n:'第五章',title:'环线'},
   {t:'say',who:'N',text:'这条轨道是一个圆。'},
   {t:'say',who:'F',text:'我们又回来了。'},
   {t:'say',who:'O',text:'一个都没少。'},
   {t:'say',who:'B',text:'我的书呢？'},
-  {t:'say',who:'H',text:'我得告诉你一件事。'},
   {t:'say',who:'H',text:'第一章那根扳道杆，从来没接到轨道上。'},
   {t:'lever',hint:'拉一下试试。'},
-  {t:'say',who:'H',text:'道岔是我在下面跟着你的杆手动扳的。'},
-  {t:'say',who:'H',text:'所以严格来说，拉杆的人一直是我。'},
+  {t:'say',who:'H',text:'道岔是我在下面跟着你的杆手动扳的。所以严格来说，拉杆的人一直是我。'},
   {t:'say',who:'H',text:'你所有的选择，都写进了一篇论文。题目叫《论扳道工》。'},
   {t:'scene',id:'you'},
   {t:'say',who:'N',text:'你发现自己站在一条轨道上。'},
@@ -311,7 +307,7 @@ function go(i){
   switch(s.t){
     case 'chapter':
       $('chapN').textContent=s.n;$('chapT').textContent=s.title;$('chapCard').hidden=false;
-      $('chap').textContent=s.n+' · '+s.title;S.chapT=0;setHint('');sfx('gong');markSeen(i);break;
+      $('chap').textContent=s.n+' · '+s.title;S.chapT=0;setHint('');sfx('gong');markSeen(i);S.popups=[];S.bubble=null;break;
     case 'scene':setScene(s.id);go(i+1);return;
     case 'say':showLine(s.who,typeof s.text==='function'?s.text():s.text);break;
     case 'do':s.fn();go(i+1);return;
@@ -335,7 +331,7 @@ function go(i){
       S.mode='end';setHint('');saveProgress(p=>{p.done=true;});
       {const v=verdict();$('verdict').textContent=v[0];
       $('endText').textContent=`你一共拉了 ${S.pulls} 次杆。宙斯的评语：${v[1]}论文已经投出去了。`;
-      $('ovEnd').hidden=false;$('btnAgain').focus();}break;
+      $('ovEnd').hidden=false;}break;
   }
   hud();
 }
@@ -490,7 +486,7 @@ function updateRun(dt){
     if(!o.hit&&!o.passed&&Math.abs(o.x-tx)<.03){if(Math.round(r.ly)===o.lane){o.hit=true;r.hits++;hitGroup({seg:null,x:o.x,n:2,hit:false,y:LANES[o.lane]});}}
     if(!o.passed&&o.x<tx-.04){o.passed=true;if(!o.hit)r.dodges++;}});
   r.obs=r.obs.filter(o=>o.x>-.1&&!o.hit);
-  if(!r.end&&r.k>=PATTERN.length&&r.obs.length===0){r.end=true;r.endT=0;}
+  if(!r.end&&r.k>=PATTERN.length&&r.obs.length===0){r.end=true;r.endT=0;S.runStats={hits:r.hits,dodges:r.dodges};}
   if(r.end){r.endT+=dt;if(r.endT>2.4&&!r.fired){r.fired=true;S.after=.1;S.afterGo='next';}}
 }
 function burst(x,y,n){if(reduce)n=Math.ceil(n/3);
@@ -661,6 +657,9 @@ function sceneRun(){
     trolley(.22*W,y,0,{tilt});
     if(Math.abs(r.lane-r.ly)>.05&&!reduce){ctx.fillStyle=C.gold;for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(.22*W-g.R*1.6-Math.random()*g.R,y-Math.random()*4,1.6,0,7);ctx.fill();}}
     if(r.end){const a=Math.min(1,r.endT/1);sign(W*.7,H*.3,'前方：环线',a);}
+    ctx.save();ctx.font=`700 ${Math.max(12,g.R*.6)}px ${FONT}`;ctx.textAlign='left';ctx.textBaseline='top';
+    const st=`躲开 ${r.dodges}　撞到 ${r.hits}`,tw=ctx.measureText(st).width;ctx.fillStyle=C.ink;ctx.fillRect(10,g.band*2+8,tw+16,g.R*1.1);
+    ctx.fillStyle=C.bone;ctx.fillText(st,18,g.band*2+8+g.R*.2);ctx.restore();
   }
   drawPins();
 }
