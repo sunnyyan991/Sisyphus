@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="一出五分钟的荒诞剧：你是新上任的踹石神，负责把西西弗斯的石头踹下山。">
-<title>西西弗斯再来一次</title>
+<meta name="description" content="诸神的差事：一组五分钟的荒诞短剧。">
+<title>诸神的差事</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <style>
-/* Layout: a black-figure vase panel — HUD rim above, painted scene as the stage, a dialogue scroll below. Single deliberate terracotta look. */
+/* Layout: a vase shoulder band, then the episodes as a row of painted panels, like scenes going round a pot. */
 :root{
   --clay:#c96a32;
   --clay-deep:#ad5527;
@@ -20,688 +20,66 @@
   --body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
   color-scheme:light;
 }
-[hidden]{display:none!important}
 *,*::before,*::after{box-sizing:border-box}
-html,body{height:100%}
-:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-body{background:var(--clay);font-size:14px;color:var(--ink);font-family:var(--body);margin:0;overflow:hidden}
-.app{height:100%;max-width:980px;margin:0 auto;padding-inline:16px;padding-block:12px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px}
-header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 20px}
-h1{font-family:var(--display);font-weight:900;font-size:clamp(22px,4.6vw,34px);margin:0;letter-spacing:.04em;line-height:1.1;text-wrap:balance}
-h1 small{display:block;font-family:var(--body);font-weight:500;font-size:12px;letter-spacing:.18em;opacity:.75;margin-top:4px}
-.hud{display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap}
-.stat{display:flex;flex-direction:column;gap:2px}
-.stat span{font-size:11px;letter-spacing:.14em;opacity:.75}
-.stat b{font-family:var(--display);font-size:22px;font-variant-numeric:tabular-nums;line-height:1}
-.stat b.chap{font-size:17px;letter-spacing:.06em}
-.mind{flex:1 1 200px;min-width:180px;max-width:260px}
-.mind .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
-.mind em{font-style:normal;font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.06em}
-.scale{position:relative;height:10px;margin-top:5px;border:2px solid var(--ink);background:var(--clay-light)}
-.scale::after{content:"";position:absolute;left:70%;top:-5px;bottom:-5px;width:2px;background:var(--ink)}
-.scale i{position:absolute;top:50%;left:20%;width:12px;height:12px;background:var(--ink);border:2px solid var(--bone);transform:translate(-50%,-50%) rotate(45deg);transition:left .35s}
-.ends{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.14em;opacity:.75;margin-top:3px}
-.ends span:last-child{margin-right:calc(30% - 2.2em)}
-.stage{flex:1;min-height:220px;min-width:0;position:relative;border:3px solid var(--ink);border-radius:3px;overflow:hidden;touch-action:manipulation;cursor:pointer;user-select:none;-webkit-user-select:none}
-canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
-.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(27,20,16,.55)}
-.card{background:var(--ink);color:var(--bone);border:2px solid var(--bone);outline:3px solid var(--ink);padding:22px 22px 20px;max-width:390px;width:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;cursor:default}
-.card h2{font-family:var(--display);font-weight:900;font-size:24px;margin:0;letter-spacing:.06em;text-wrap:balance}
-.card p{margin:0;line-height:1.7;font-size:14px;opacity:.92}
-.card .q{font-family:var(--display);font-size:15px;opacity:.85;border-top:1px solid rgba(243,226,199,.25);padding-top:10px}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-.chapcard{background:transparent;pointer-events:none;flex-direction:column;gap:6px;color:var(--bone);text-align:center}
-.chapcard .n{font-family:var(--display);font-size:14px;letter-spacing:.5em;padding-left:.5em;opacity:.85}
-.chapcard .t{font-family:var(--display);font-weight:900;font-size:clamp(40px,9vw,72px);letter-spacing:.2em;padding-left:.2em;line-height:1.1;text-shadow:0 3px 0 var(--ink)}
-.chapcard .rule{width:min(260px,60%);height:8px;border-block:2px solid var(--bone);margin-top:6px}
-.chapcard{animation:chapIn .5s ease-out}
-@keyframes chapIn{from{opacity:0;transform:translateY(8px)}}
-button{font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:.12em;background:var(--clay);color:var(--ink);border:2px solid var(--bone);padding:10px 20px;border-radius:2px;cursor:pointer}
-button:hover{background:var(--gold)}
-button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-.dlg{position:relative;min-height:84px;background:var(--ink);color:var(--bone);border:2px solid var(--ink);box-shadow:inset 0 0 0 2px var(--bone);padding:12px 18px 14px;box-sizing:border-box;display:flex;flex-direction:column;gap:4px;cursor:pointer;user-select:none;-webkit-user-select:none}
-.dlg .who{font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.18em;color:var(--gold);min-height:1.2em}
-.dlg .who small{font-family:var(--body);font-weight:400;font-size:11px;letter-spacing:.08em;color:var(--bone);opacity:.6;margin-left:8px}
-.dlg .txt{font-family:var(--display);font-weight:700;font-size:clamp(15px,2.2vw,18px);line-height:1.6;min-width:0;padding-right:28px}
-.dlg.narr .txt{font-weight:400;opacity:.85;letter-spacing:.08em}
-.dlg.hint .txt{font-family:var(--body);font-weight:400;font-size:14px;opacity:.7;letter-spacing:.06em}
-.dlg .more{position:absolute;right:14px;bottom:10px;font-size:12px;color:var(--gold);animation:blink 1s steps(2) infinite}
-@keyframes blink{50%{opacity:0}}
-.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;opacity:.85;flex-wrap:wrap}
-.foot button{font-family:var(--body);font-size:12px;letter-spacing:.06em;padding:4px 10px;background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
-.foot button:hover{background:var(--clay-light)}
-@media (max-width:480px){.stat b{font-size:18px}.hud{gap:12px}.dlg{min-height:96px}}
-@media (prefers-reduced-motion:reduce){.chapcard,.dlg .more{animation:none}.scale i{transition:none}}
+html{background:var(--clay)}
+body{background:var(--clay);color:var(--ink);font-family:var(--body);margin:0;font-size:15px}
+.wrap{max-width:980px;margin:0 auto;padding-inline:16px;padding-block:28px 40px;display:flex;flex-direction:column;gap:28px}
+.band{height:22px;background:
+  linear-gradient(var(--ink),var(--ink)) 0 0/100% 3px no-repeat,
+  linear-gradient(var(--ink),var(--ink)) 0 100%/100% 3px no-repeat,
+  repeating-linear-gradient(90deg,var(--ink) 0 3px,transparent 3px 22px)}
+header{display:flex;flex-direction:column;gap:10px}
+.eyebrow{font-size:12px;letter-spacing:.3em;opacity:.75}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(44px,10vw,88px);letter-spacing:.12em;margin:0;line-height:1;text-wrap:balance}
+.lede{max-width:34em;line-height:1.8;margin:0;font-size:16px}
+.eps{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.ep{background:var(--ink);color:var(--bone);border:3px solid var(--ink);box-shadow:inset 0 0 0 2px var(--bone);padding:22px 22px 20px;display:flex;flex-direction:column;gap:10px;text-decoration:none;min-width:0;transition:transform .15s}
+a.ep:hover{transform:translateY(-3px)}
+a.ep:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.ep .no{font-family:var(--display);font-size:13px;letter-spacing:.3em;color:var(--gold)}
+.ep h2{font-family:var(--display);font-weight:900;font-size:24px;margin:0;letter-spacing:.04em;line-height:1.3;text-wrap:balance}
+.ep .job{font-size:12px;letter-spacing:.14em;opacity:.65}
+.ep p{margin:0;line-height:1.7;font-size:14px;opacity:.9}
+.ep .go{margin-top:auto;padding-top:6px;font-family:var(--display);font-weight:700;letter-spacing:.14em;font-size:14px}
+.ep.tbd{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink);border-style:dashed}
+.ep.tbd .no{color:var(--ink);opacity:.7}
+footer{font-size:12px;opacity:.75;line-height:1.8}
+@media (prefers-reduced-motion:reduce){a.ep{transition:none}}
 </style>
 </head>
 <body>
-<div class="app">
+<div class="wrap">
+  <div class="band" aria-hidden="true"></div>
   <header>
-    <h1>西西弗斯再来一次<small>一出五分钟的荒诞剧</small></h1>
-    <div class="hud">
-      <div class="stat"><span>章节</span><b class="chap" id="chap">序</b></div>
-      <div class="stat"><span>踹了</span><b id="kicks">0</b></div>
-      <div class="stat"><span>绩效</span><b id="score">0</b></div>
-      <div class="stat mind" id="mind" style="visibility:hidden"><div class="top"><span>绝望指数（KPI）</span><em id="mood">心态很好</em></div><div class="scale"><i id="marker"></i></div><div class="ends"><span>0</span><span>宙斯满意</span></div></div>
-    </div>
+    <div class="eyebrow">一组五分钟的荒诞短剧</div>
+    <h1>诸神的差事</h1>
+    <p class="lede">你是奥林匹斯新录用的公务员，归冥界人事部的赫尔墨斯管。每一集，你都被调去一份新的天罚岗位，执行一个永远做不完的工作。</p>
   </header>
 
-  <div class="stage" id="stage">
-    <canvas id="c"></canvas>
-    <div class="overlay chapcard" id="chapCard" hidden><div class="n" id="chapN">第一章</div><div class="t" id="chapT">入职</div><div class="rule"></div></div>
-    <div class="overlay" id="ovTitle">
-      <div class="card">
-        <h2>你被录用了</h2>
-        <p>你是一位新上任的小神。工作很简单：等那个人把石头推到快山顶的时候，一脚踹下去。</p>
-        <p>点画面或按空格踹石头。对话也是点一下翻页。全程大约五分钟。</p>
-        <div class="row"><button id="btnStart">上岗</button></div>
-      </div>
+  <section class="eps" aria-label="剧集">
+    <a class="ep" href="sisyphus/">
+      <span class="no">第一份差事</span>
+      <h2>西西弗斯再来一次</h2>
+      <span class="job">岗位：踹石神</span>
+      <p>他把石头推上山，你在他快到的时候一脚踹下去。宙斯开始考核绝望指数，石头上多了一张脸，工会也成立了。</p>
+      <span class="go">上岗 →</span>
+    </a>
+    <a class="ep" href="prometheus/">
+      <span class="no">第二份差事</span>
+      <h2>普罗米修斯，四种说法</h2>
+      <span class="job">岗位：啄肝鹰（外包）</span>
+      <p>宙斯的鹰辞职了，你穿上中号的鹰制服顶班。关于这份工作有四种说法，他坚持认为那是一件事的四个阶段。</p>
+      <span class="go">上岗 →</span>
+    </a>
+    <div class="ep tbd">
+      <span class="no">第三份差事</span>
+      <h2>待定</h2>
+      <p>赫尔墨斯还在找下一个岗位。</p>
     </div>
-    <div class="overlay" id="ovEnd" hidden>
-      <div class="card">
-        <h2>完</h2>
-        <p id="endText"></p>
-        <p class="q">我们必须想象诸神也是幸福的。</p>
-        <div class="row"><button id="btnAgain">从头再来</button></div>
-      </div>
-    </div>
-  </div>
+  </section>
 
-  <div class="dlg hint" id="dlg" role="status" aria-live="polite">
-    <div class="who" id="who"></div>
-    <div class="txt" id="txt">冥界，塔尔塔罗斯，某座山。</div>
-    <div class="more" id="more" hidden>▼</div>
-  </div>
-
-  <div class="foot">
-    <span>灵感来自希腊神话与加缪《西西弗斯神话》。</span>
-    <button id="btnSound" type="button" aria-pressed="true">声音：开</button>
-  </div>
+  <div class="band" aria-hidden="true"></div>
+  <footer>灵感来自希腊神话、加缪《西西弗斯神话》与卡夫卡《普罗米修斯》。点屏幕或按空格游玩，每集约五分钟。</footer>
 </div>
-
-<script>
-(()=>{
-const C={clay:'#c96a32',deep:'#ad5527',light:'#dc8a52',ink:'#1b1410',bone:'#f3e2c7',gold:'#e8b04f'};
-const FONT='"Noto Serif SC","Songti SC",serif';
-const cvs=document.getElementById('c'),ctx=cvs.getContext('2d'),stage=document.getElementById('stage');
-const $=id=>document.getElementById(id);
-const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-let W=0,H=0,g={};
-
-function resize(){
-  const r=stage.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);
-  W=r.width;H=r.height;cvs.width=Math.round(W*dpr);cvs.height=Math.round(H*dpr);
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  const band=Math.max(10,Math.min(22,H*.05));
-  const yb=H-band*1.6-H*.08, yt=Math.max(band*2.6+H*.12,H*.3);
-  const R=Math.max(12,Math.min(W*.042,H*.07));
-  const x0=Math.max(W*.15,R*5.6),x1=W*.8,dx=x1-x0,dy=yb-yt,L=Math.hypot(dx,dy);
-  g={band,yb,yt,x0,x1,L,ux:dx/L,uy:-dy/L,R};
-}
-// The stage can change size without the window resizing (header wraps, panels appear),
-// so watch the stage itself; otherwise the canvas bitmap gets stretched.
-if('ResizeObserver' in window)new ResizeObserver(()=>resize()).observe(stage);
-else addEventListener('resize',resize);
-
-function pt(f){
-  const s=f*g.L;
-  if(s<=0) return {x:g.x0+s,y:g.yb,ux:1,uy:0};
-  if(s>=g.L) return {x:g.x1+(s-g.L),y:g.yt,ux:1,uy:0};
-  return {x:g.x0+g.ux*s,y:g.yb+g.uy*s,ux:g.ux,uy:g.uy};
-}
-function center(f){const p=pt(f);return {x:p.x+p.uy*g.R,y:p.y-p.ux*g.R};}
-const off=()=>g.R*3/g.L;
-const fmin=()=>Math.min(0,-(g.x0-g.R*4.4)/g.L);
-const pick=a=>a[Math.floor(Math.random()*a.length)];
-
-// ---------- the script ----------
-const WHO={H:['赫尔墨斯','冥界人事部'],S:['西西弗斯','受罚者'],N:['','']};
-const SCRIPT=[
-  {t:'chapter',n:'第一章',title:'入职'},
-  {t:'say',who:'H',text:'恭喜你通过奥林匹斯公务员考试。'},
-  {t:'say',who:'H',text:'我是赫尔墨斯。冥界人事部、快递部、引魂部，都是我。'},
-  {t:'say',who:'H',text:'你的岗位是：踹石神。'},
-  {t:'say',who:'H',text:'下面那位叫西西弗斯。骗过死神，惹毛了宙斯，判的是无期。'},
-  {t:'say',who:'H',text:'他负责把石头推上山。你负责在他快到的时候，一脚踹下去。'},
-  {t:'say',who:'H',text:'点屏幕就是一脚。上一任踹了三千年，上周刚退休。去吧。'},
-  {t:'play',n:2,hint:'点屏幕踹石头。等他快到山顶再踹。',
-    lines:{start:['……新来的？','嘿咻。'],kicked:['脚法不错。','上一任比你温柔。']}},
-
-  {t:'chapter',n:'第二章',title:'绩效'},
-  {t:'say',who:'H',text:'宙斯看了你的第一份周报。'},
-  {t:'say',who:'H',text:'他说“还行”。在奥林匹斯，“还行”的意思是重写。'},
-  {t:'do',fn:()=>{S.showMeter=true;hud();}},
-  {t:'say',who:'H',text:'从今天起考核绝望指数，右上角那条。石头离山顶越近再踹，他越绝望。'},
-  {t:'say',who:'H',text:'他下山的路上会自己想开一点。所以，别给他太多时间。'},
-  {t:'say',who:'S',text:'你们神也有考核？'},
-  {t:'say',who:'S',text:'……那你们挺惨的。'},
-  {t:'play',n:3,hint:'越接近山顶再踹，绝望指数涨得越多。',
-    lines:{start:['你们有年假吗？','绩效分几档？','我当国王的时候，也给人打过绩效。'],kicked:['这脚算 A 还是 B？','加油，争取评优。','我帮你记着数呢。']}},
-
-  {t:'chapter',n:'第三章',title:'石头先生'},
-  {t:'say',who:'H',text:'宙斯看了你的第二份周报。'},
-  {t:'say',who:'H',text:()=>S.despair>=55?'他说“还行”的时候，语气缓和了一点。':'他说，再这样就调你去看守坦塔罗斯的葡萄。'},
-  {t:'say',who:'N',text:'这段时间，西西弗斯在石头上画了一张脸。'},
-  {t:'do',fn:()=>{S.face=true;burst(center(S.f).x,center(S.f).y,8);sfx('pop');}},
-  {t:'say',who:'S',text:'介绍一下，这是石头先生。'},
-  {t:'say',who:'S',text:'我们认识很多年了。踹它的时候，请轻一点。'},
-  {t:'play',n:3,hint:'踹石头先生。',
-    lines:{start:['石头先生，我们走。','它今天心情不错。','它说它想看看山顶。'],kicked:['石头先生！！','它说它没事。','它说你鞋带开了。']}},
-
-  {t:'chapter',n:'第四章',title:'罢工'},
-  {t:'say',who:'S',text:'我和隔壁的坦塔罗斯商量过了。'},
-  {t:'say',who:'S',text:'我们成立了冥界受罚者工会。'},
-  {t:'say',who:'S',text:'从现在开始，罢工。'},
-  {t:'strike',hint:'他坐下了。你可以踹踹看。'},
-  {t:'say',who:'H',text:'……'},
-  {t:'say',who:'H',text:'罢工申请已收到，已转交投诉处理部。'},
-  {t:'say',who:'H',text:'预计处理时长：永恒。'},
-  {t:'do',fn:()=>{S.st='idle';S.sign=false;}},
-  {t:'say',who:'S',text:'……那我先推着，等结果。'},
-  {t:'play',n:2,hint:'工作照常。',
-    lines:{start:['仲裁还没回音。','工会刚开完会。'],kicked:['工会会记住这一脚的。','我要申请仲裁。']}},
-
-  {t:'chapter',n:'第五章',title:'一本书'},
-  {t:'say',who:'N',text:'天上掉下来一本书。'},
-  {t:'do',fn:()=>{S.book={x:Math.max(g.R*.8,pt(S.fs).x-g.R*.9),y:-30,vy:0,landed:false};}},
-  {t:'wait',d:1.6},
-  {t:'say',who:'S',text:'《西西弗斯神话》？写我的？'},
-  {t:'say',who:'S',text:'作者是个法国人。最后一句是……'},
-  {t:'say',who:'S',text:'“人们必须想象西西弗斯是幸福的。”'},
-  {t:'say',who:'S',text:'……'},
-  {t:'say',who:'S',text:'人家都这么写了，我总不能让读者失望。'},
-  {t:'do',fn:()=>{S.zen=true;sfx('zen');hud();}},
-  {t:'play',n:3,hint:'踹吧。',
-    lines:{start:['今天天气真好～','嘿咻～','石头先生，再来一趟！'],kicked:['谢谢！','好脚！','再来再来！']}},
-
-  {t:'chapter',n:'第六章',title:'调岗'},
-  {t:'say',who:'H',text:'宙斯看了这个月的报表。'},
-  {t:'say',who:'H',text:'绝望指数：零。'},
-  {t:'say',who:'H',text:'他把杯子摔了。金的。'},
-  {t:'say',who:'H',text:'鉴于你的业绩，你被调岗了。新岗位：推石神。'},
-  {t:'do',fn:()=>{S.finale=true;S.f=.02;S.fs=S.f-off();S.st='idle';S.vel=0;burst(pt(S.fs).x,pt(S.fs).y-g.R,10);sfx('pop');}},
-  {t:'say',who:'S',text:'别担心，踹石神的岗位我已经申请到了。'},
-  {t:'say',who:'S',text:'我会比上一任温柔的。'},
-  {t:'finale',n:3,hint:'现在轮到你了。连点屏幕，把石头推上去。',
-    lines:{kicked:['新来的？','脚法还行吧？','我给自己打 A。']}},
-  {t:'end'}
-];
-
-// ---------- state ----------
-const S={};
-function reset(mode){
-  Object.assign(S,{mode,si:-1,step:null,st:'push',f:.02,vel:0,fs:.02-off(),timer:0,walk:0,walking:false,stopped:false,landed:false,
-    pushTime:mode==='story'?5.6:4.2,score:0,kicks:0,pushes:0,combo:0,despair:15,showMeter:false,zen:false,face:false,sign:false,book:null,finale:false,
-    burst:0,burstChecked:false,kick:0,kickFrom:'sky',kickPt:null,shake:0,squash:0,wob:0,flash:0,
-    bubble:null,popups:[],dust:[],phase:0,ri:0,left:0,lines:null,wait:0,chapT:0,typing:false,tw:0,full:'',strikeT:0,strikeTaps:0,strikeEnd:0,
-    autoAt:.6+Math.random()*.3,walkDecay:0});
-}
-function say(t,dur=1.8){S.bubble={t,life:dur};}
-function addDespair(d){S.despair=Math.max(0,Math.min(100,S.despair+d));}
-
-// ---------- dialogue panel ----------
-function setHint(text){
-  const d=$('dlg');d.className='dlg hint';$('who').textContent='';$('txt').textContent=text||'';$('more').hidden=true;S.typing=false;
-}
-function showLine(who,text){
-  const d=$('dlg');d.className='dlg'+(who==='N'?' narr':'');
-  const w=WHO[who];$('who').innerHTML=w[0]?`${w[0]}<small>${w[1]}</small>`:'';
-  S.full=text;S.tw=0;S.typing=!reduce;$('txt').textContent=reduce?text:'';$('more').hidden=S.typing;
-}
-function finishTyping(){S.typing=false;$('txt').textContent=S.full;$('more').hidden=false;}
-
-// ---------- script runner ----------
-function go(i){
-  S.si=i;const s=SCRIPT[i];S.step=s;
-  $('chapCard').hidden=true;
-  switch(s.t){
-    case 'chapter':
-      $('chapN').textContent=s.n;$('chapT').textContent=s.title;$('chapCard').hidden=false;
-      $('chap').textContent=s.n+' · '+s.title;S.chapT=0;setHint('');sfx('gong');break;
-    case 'say':showLine(s.who,typeof s.text==='function'?s.text():s.text);break;
-    case 'do':s.fn();go(i+1);return;
-    case 'wait':S.wait=s.d;setHint('');break;
-    case 'play':setHint(s.hint);S.left=s.n;S.ri=0;S.lines=s.lines;S.combo=0;startPush();break;
-    case 'strike':setHint(s.hint);S.st='strike';S.sign=true;S.strikeT=0;S.strikeTaps=0;S.strikeEnd=0;say('罢工中。',2.2);break;
-    case 'finale':setHint(s.hint);S.left=s.n;S.ri=0;S.lines=s.lines;S.st='fpush';break;
-    case 'end':
-      S.mode='end';setHint('');
-      $('endText').textContent=`你在踹石神任上踹了 ${S.kicks} 脚，绩效 ${S.score}。现在，你也有了一块自己的石头。`;
-      setTimeout(()=>{$('ovEnd').hidden=false;$('btnAgain').focus();},600);
-      break;
-  }
-  hud();
-}
-const next=()=>go(S.si+1);
-
-function hud(){
-  $('kicks').textContent=S.kicks;$('score').textContent=S.score;
-  $('mind').style.visibility=S.showMeter?'visible':'hidden';
-  $('marker').style.left=S.despair.toFixed(1)+'%';
-  const d=S.despair;
-  $('mood').textContent=S.zen?(d<1?'他很幸福':'正在变幸福'):d<20?'心态很好':d<45?'有点烦':d<70?'很沮丧':'达标了';
-}
-
-// ---------- actions ----------
-function startPush(){
-  S.st='push';S.burstChecked=false;
-  if(S.mode==='story')S.pushTime=Math.max(2.4,S.pushTime*.95);
-  S.autoAt=.6+Math.random()*.3;
-  const L=S.lines;
-  if(S.mode==='story'&&L&&L.start)say(L.start[S.ri%L.start.length],1.5);
-  else if(S.mode==='title')say(pick(['嘿咻。','再来一次。','这次一定。']),1.3);
-}
-
-function kick(){
-  if(S.st!=='push')return;
-  const h=Math.max(0,S.f);
-  S.st='roll';S.vel=-(0.55+0.55*h);S.timer=0;S.kick=.38;S.kickFrom='sky';S.shake=reduce?0:.22;S.squash=1;S.stopped=false;S.landed=false;S.walkDecay=0;
-  const c=center(S.f);burst(c.x,c.y,10);sfx('kick');
-  if(S.mode!=='story'){say(pick(['……','又来？','行吧。']));return;}
-  S.kicks++;
-  let pts,label,d;
-  if(h<.35&&!S.zen){
-    pts=h<.2?1:Math.round(h*h*100);S.combo=0;label=(h<.2?'太早了':'还行')+`  +${pts}`;d=-4;
-    say(pick(['这么急？','我还没出汗呢。','你是不是手滑了？']));
-  }else{
-    pts=Math.max(1,Math.round(h*h*100));
-    if(h>.85){S.combo++;const m=1+S.combo;pts*=m;label=`近在咫尺 ×${m}  +${pts}`;}
-    else{S.combo=0;label=(h>.6?'希望破灭':'还行')+`  +${pts}`;}
-    d=Math.round(16*h*h*(1+.25*Math.max(0,S.combo-1)));
-    const L=S.lines;say(L.kicked[S.ri%L.kicked.length]);
-  }
-  if(S.zen)d=0;
-  S.score+=pts;
-  S.popups.push({x:c.x,y:c.y-g.R*1.4,t:label,life:1.3,hot:h>.85});
-  if(S.showMeter){addDespair(d);S.popups.push({x:c.x,y:c.y-g.R*.4,t:`绝望 ${d>=0?'+':'−'}${Math.abs(d)}`,life:1.3,small:true,good:d>0});}
-  hud();
-}
-
-function sisKick(){
-  const c=center(S.f);
-  S.st='roll';S.vel=-1.0;S.timer=0;S.kick=.38;S.kickFrom='sis';S.kickPt={x:c.x+g.R*.55,y:c.y-g.R*.7};
-  S.shake=reduce?0:.2;S.squash=1;S.stopped=false;S.landed=false;
-  burst(c.x,c.y,10);sfx('kick');S.pushes++;
-  const L=S.lines;say(L.kicked[S.ri%L.kicked.length],1.8);
-}
-
-function rollback(){
-  S.f=.02;S.fs=S.f-off();S.flash=reduce?0:.6;S.combo=0;
-  S.popups.push({x:W/2,y:H*.45,t:'检测到违规登顶 · 已回滚',life:1.8,hot:true});
-  say('啊？？',1.4);sfx('pop');
-}
-
-function roundDone(){
-  if(S.mode==='title'){startPush();return;}
-  const s=S.step;S.ri++;S.left--;
-  if(s.t==='play'){if(S.left>0)startPush();else{S.st='idle';next();}}
-  else if(s.t==='finale'){if(S.left>0)S.st='fpush';else{S.st='idle';next();}}
-}
-
-function strikeTap(){
-  if(S.kick>0||S.strikeEnd>0)return;
-  S.kick=.38;S.kickFrom='sky';S.wob=.5;S.shake=reduce?0:.12;sfx('kick');S.strikeTaps++;
-  const c=center(S.f);burst(c.x,c.y,6);
-  say(['它已经在山脚了。','再踹也还是山脚。','你踹的是工会财产。'][Math.min(S.strikeTaps-1,2)],1.6);
-  if(S.strikeTaps>=3)S.strikeEnd=1.6;
-}
-
-function tap(){
-  if(S.mode!=='story')return;
-  ensureAudio();
-  const s=S.step;if(!s)return;
-  if(s.t==='say'){if(S.typing)finishTyping();else{sfx('tick');next();}}
-  else if(s.t==='chapter'){if(S.chapT>.5)next();}
-  else if(s.t==='play')kick();
-  else if(s.t==='strike')strikeTap();
-  else if(s.t==='finale'&&S.st==='fpush'){S.f=Math.min(.93,S.f+.055);S.walk+=1.1;sfx('step');}
-}
-
-function burst(x,y,n){
-  if(reduce)n=Math.ceil(n/3);
-  for(let i=0;i<n;i++){const a=-Math.PI*Math.random();const sp=40+Math.random()*120;
-    S.dust.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:.5+Math.random()*.4,r:1.5+Math.random()*3});}
-}
-
-// ---------- update ----------
-function update(dt){
-  S.phase+=dt;
-  if(S.mode==='story'&&S.step){
-    const s=S.step;
-    if(s.t==='chapter'){S.chapT+=dt;if(S.chapT>2.2)next();}
-    if(s.t==='wait'){S.wait-=dt;if(S.wait<=0)next();}
-    if(s.t==='strike'){S.strikeT+=dt;
-      if(S.strikeEnd>0){S.strikeEnd-=dt;if(S.strikeEnd<=0)next();}
-      else if(S.strikeT>9)next();}
-  }
-  if(S.typing){S.tw+=dt*34;const n=Math.floor(S.tw);$('txt').textContent=S.full.slice(0,n);if(n>=S.full.length)finishTyping();}
-  if(S.book&&!S.book.landed){S.book.vy+=900*dt;S.book.y+=S.book.vy*dt;if(S.book.y>=g.yb){S.book.y=g.yb;S.book.landed=true;burst(bookX(),g.yb,10);S.shake=reduce?0:.12;sfx('land');say('？',1.2);}}
-  if(S.zen&&S.despair>0){S.despair=Math.max(0,S.despair-30*dt);hud();}
-
-  if(S.st==='push'){
-    let sp=1/S.pushTime*(0.85+0.3*S.f);
-    if(S.burst>0){sp*=2.3;S.burst-=dt;}
-    S.f+=sp*dt;S.fs=S.f-off();S.walk+=dt*(5+sp*30);
-    if(!S.burstChecked&&S.f>.42){S.burstChecked=true;
-      if(S.mode==='story'&&S.kicks>=5&&!S.zen&&Math.random()<.35){S.burst=.6;say('冲啊！',1);}}
-    if(S.mode==='title'&&S.f>S.autoAt)kick();
-    if(S.f>=1){if(S.mode==='story')rollback();else kick();}
-  }else if(S.st==='fpush'){
-    S.f=Math.max(.02,S.f-.035*dt);S.fs=S.f-off();
-    if(S.f>=.9)sisKick();
-  }else if(S.st==='roll'){
-    const wasUp=S.f>0;
-    if(S.f>0)S.vel-=2.0*dt;
-    else{S.vel*=Math.pow(.12,dt);if(Math.abs(S.vel)<.02){S.vel=0;S.stopped=true;}}
-    S.f+=S.vel*dt;
-    if(wasUp&&S.f<=0&&!S.landed){S.landed=true;const c=center(0);burst(c.x,c.y+g.R,14);S.shake=reduce?0:.18;sfx('land');}
-    if(S.f<fmin()){S.f=fmin();S.vel=-S.vel*.3;}
-    S.timer+=dt;S.squash=Math.max(0,S.squash-dt*1.4);
-    if(S.timer>.85){
-      const target=S.f-off();
-      if(S.fs>target+.001){
-        S.fs=Math.max(target,S.fs-.42*dt);S.walk+=dt*10;S.walking=true;
-        if(S.mode==='story'&&S.showMeter&&!S.zen&&!S.finale){addDespair(-1.8*dt);S.walkDecay+=1.8*dt;hud();}
-      }else{
-        S.walking=false;
-        if(S.stopped){
-          if(S.walkDecay>=1){const hd=S._head;if(hd)S.popups.push({x:hd.x,y:hd.y-g.R*1.2,t:`下山想开了 −${Math.round(S.walkDecay)}`,life:1.2,small:true});S.walkDecay=0;}
-          roundDone();
-        }
-      }
-    }
-  }
-  if(S.bubble){S.bubble.life-=dt;if(S.bubble.life<=0)S.bubble=null;}
-  S.kick=Math.max(0,S.kick-dt);S.shake=Math.max(0,S.shake-dt);S.wob=Math.max(0,S.wob-dt);S.flash=Math.max(0,S.flash-dt);
-  S.popups.forEach(p=>{p.life-=dt;p.y-=30*dt;});S.popups=S.popups.filter(p=>p.life>0);
-  S.dust.forEach(d=>{d.life-=dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.vy+=220*dt;});S.dust=S.dust.filter(d=>d.life>0);
-}
-
-// ---------- draw ----------
-function meander(y,h){
-  const s=h,n=Math.ceil(W/s)+1;
-  ctx.save();ctx.strokeStyle=C.ink;ctx.lineWidth=Math.max(2,h*.14);ctx.lineJoin='miter';
-  ctx.beginPath();
-  for(let i=0;i<n;i++){const x=i*s;
-    ctx.moveTo(x,y+s);ctx.lineTo(x,y);ctx.lineTo(x+s*.8,y);ctx.lineTo(x+s*.8,y+s*.62);
-    ctx.lineTo(x+s*.38,y+s*.62);ctx.lineTo(x+s*.38,y+s*.32);}
-  ctx.moveTo(0,y+s);ctx.lineTo(W,y+s);
-  ctx.stroke();ctx.restore();
-}
-function scene(){
-  const grd=ctx.createRadialGradient(W*.6,H*.25,10,W*.6,H*.3,Math.max(W,H)*.8);
-  grd.addColorStop(0,C.light);grd.addColorStop(1,C.clay);
-  ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);
-  meander(g.band*.5,g.band);
-  ctx.beginPath();ctx.moveTo(-5,H);ctx.lineTo(-5,g.yb);ctx.lineTo(g.x0,g.yb);ctx.lineTo(g.x1,g.yt);ctx.lineTo(W+5,g.yt);ctx.lineTo(W+5,H);ctx.closePath();
-  ctx.fillStyle=C.deep;ctx.fill();
-  ctx.lineWidth=4;ctx.strokeStyle=C.ink;ctx.lineJoin='round';ctx.stroke();
-  ctx.save();ctx.clip();ctx.strokeStyle=C.clay;ctx.lineWidth=1.5;
-  for(let k=1;k<7;k++){const d=k*g.R*.9;ctx.beginPath();
-    ctx.moveTo(-5,g.yb+d);ctx.lineTo(g.x0+d*.4,g.yb+d);ctx.lineTo(g.x1+d*.4,g.yt+d);ctx.lineTo(W+5,g.yt+d);ctx.stroke();}
-  ctx.restore();
-  const cx=g.x1+(W-g.x1)*.62,cw=Math.min(g.R*.9,(W-g.x1)*.25),ch=g.R*3.2;
-  ctx.fillStyle=C.ink;
-  ctx.fillRect(cx-cw*.5,g.yt-ch,cw,ch);
-  ctx.fillRect(cx-cw*.9,g.yt-ch-cw*.35,cw*1.8,cw*.35);
-  ctx.fillRect(cx-cw*.8,g.yt-cw*.25,cw*1.6,cw*.25);
-  ctx.strokeStyle=C.clay;ctx.lineWidth=1;
-  for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(cx+i*cw*.22,g.yt-ch+3);ctx.lineTo(cx+i*cw*.22,g.yt-cw*.3);ctx.stroke();}
-  sprig(g.x0*.3,g.yb);
-  ctx.fillStyle=C.ink;ctx.fillRect(0,H-g.band*1.1,W,g.band*1.1);
-  ctx.strokeStyle=C.clay;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,H-g.band*.7);ctx.lineTo(W,H-g.band*.7);ctx.stroke();
-}
-function sprig(x,y){
-  ctx.save();ctx.strokeStyle=C.ink;ctx.fillStyle=C.ink;ctx.lineWidth=2;
-  ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x+4,y-g.R*1.2,x-2,y-g.R*2);ctx.stroke();
-  for(let i=1;i<5;i++){const t=i/5,px=x+Math.sin(t*3)*3,py=y-g.R*2*t;
-    ctx.beginPath();ctx.ellipse(px+(i%2?6:-6),py,5,2,i%2?-.5:.5,0,7);ctx.fill();}
-  ctx.restore();
-}
-const bookX=()=>S.book.x;
-function book(){
-  if(!S.book)return;
-  const x=bookX(),y=S.book.y,w=g.R*1.1,h=g.R*.32;
-  ctx.save();ctx.translate(x,y);if(!S.book.landed)ctx.rotate(S.phase*6);
-  ctx.fillStyle=C.ink;ctx.fillRect(-w/2,-h,w,h);
-  ctx.fillStyle=C.bone;ctx.fillRect(-w/2+2,-h+2,w-4,h*.35);
-  ctx.restore();
-}
-function boulder(){
-  const c=center(S.f),ang=S.f*g.L/g.R;
-  const wx=S.wob>0?Math.sin(S.wob*40)*S.wob*6:0;
-  ctx.save();ctx.translate(c.x+wx,c.y);ctx.rotate(ang);
-  ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(0,0,g.R,0,7);ctx.fill();
-  ctx.strokeStyle=C.clay;ctx.lineWidth=1.6;
-  if(S.face){
-    ctx.fillStyle=C.bone;ctx.strokeStyle=C.bone;ctx.lineWidth=2;
-    ctx.beginPath();ctx.arc(-g.R*.32,-g.R*.2,g.R*.1,0,7);ctx.arc(g.R*.32,-g.R*.2,g.R*.1,0,7);ctx.fill();
-    ctx.beginPath();
-    if(S.st==='roll'&&S.timer<1.2)ctx.ellipse(0,g.R*.3,g.R*.18,g.R*.22,0,0,7);
-    else ctx.arc(0,g.R*.08,g.R*.42,.35,Math.PI-.35);
-    ctx.stroke();
-  }else{
-    ctx.beginPath();ctx.arc(0,0,g.R*.62,.2,2.6);ctx.stroke();
-    ctx.beginPath();ctx.arc(g.R*.12,-g.R*.05,g.R*.32,3,5.4);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(-g.R*.7,-g.R*.35);ctx.lineTo(-g.R*.45,-g.R*.55);ctx.stroke();
-  }
-  ctx.restore();
-}
-
-function limb(a,b,bend){
-  const mx=(a.x+b.x)/2+bend.x,my=(a.y+b.y)/2+bend.y;
-  ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(mx,my);ctx.lineTo(b.x,b.y);ctx.stroke();
-}
-// o: {F, pose:'push'|'stand'|'walk'|'sit'|'kick', face, arms:'side'|'head'|'behind'|'swing', beard, wreath, mood:'smile'|'frown'|'flat', sweat, notes, target}
-function figure(o){
-  const F=o.F,u={x:F.ux,y:F.uy},h=g.R*2.7,lw=h*.07,P=(x,y)=>({x,y});
-  const sw=Math.sin(o.walk||0);
-  let hip,sh,head,hands,feet,bends,face=o.face||1;
-  ctx.save();
-  if(o.squash>0){const k=1-.72*Math.min(1,o.squash*1.3);ctx.translate(F.x,F.y);ctx.scale(1+.4*(1-k),k);ctx.translate(-F.x,-F.y);}
-  ctx.strokeStyle=C.ink;ctx.fillStyle=C.ink;ctx.lineCap='round';ctx.lineJoin='round';
-  if(o.pose==='push'){
-    const b=center(S.f);
-    const hand=P(b.x-u.x*g.R*.92,b.y-u.y*g.R*.92-g.R*.1);
-    hip=P(F.x-u.x*h*.15,F.y-u.y*h*.15-h*.42);
-    const dx=hand.x-hip.x,dy=hand.y-hip.y,dl=Math.hypot(dx,dy)||1;
-    sh=P(hip.x+dx/dl*h*.32,hip.y+dy/dl*h*.32);
-    head=P(sh.x+dx/dl*h*.11,sh.y+dy/dl*h*.11-h*.07);
-    hands=[hand,P(hand.x+u.x*2,hand.y+g.R*.25)];
-    const st=h*.16;
-    feet=[P(F.x+u.x*st*sw,F.y+u.y*st*sw),P(F.x-u.x*st*sw-u.x*h*.08,F.y-u.y*st*sw-u.y*h*.08)];
-    const kb=P(u.x*h*.07,-h*.03);bends=[kb,kb];face=1;
-  }else if(o.pose==='sit'){
-    hip=P(F.x,F.y-h*.16);sh=P(hip.x-h*.02,hip.y-h*.32);head=P(sh.x+h*.02,sh.y-h*.13);
-    feet=[P(F.x+h*.3,F.y),P(F.x+h*.25,F.y)];bends=[P(0,-h*.17),P(0,-h*.15)];
-    const sg=P(sh.x+h*.15,sh.y-h*.02);hands=[sg,P(hip.x+h*.17,hip.y-h*.15)];face=1;
-    if(o.sign){
-      ctx.lineWidth=h*.035;ctx.beginPath();ctx.moveTo(sg.x,sg.y+h*.15);ctx.lineTo(sg.x,sg.y-h*.42);ctx.stroke();
-      const bw=h*.5,bh=h*.24,bx=sg.x-bw/2,by=sg.y-h*.42-bh;
-      ctx.fillStyle=C.bone;ctx.lineWidth=2;ctx.fillRect(bx,by,bw,bh);ctx.strokeRect(bx,by,bw,bh);
-      ctx.fillStyle=C.ink;ctx.font=`900 ${Math.max(10,bh*.62)}px ${FONT}`;ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillText('罢工',sg.x,by+bh/2+1);ctx.fillStyle=C.ink;
-    }
-  }else if(o.pose==='kick'){
-    face=-1;hip=P(F.x,F.y-h*.45);sh=P(hip.x+h*.07,hip.y-h*.3);head=P(sh.x+h*.01,sh.y-h*.13);
-    feet=[P(F.x+h*.04,F.y),o.target];bends=[P(h*.03,0),P(h*.02,-h*.06)];
-    hands=[P(sh.x+h*.22,sh.y-h*.12),P(sh.x-h*.08,sh.y-h*.24)];
-  }else{
-    const walking=o.pose==='walk';
-    const bob=walking?Math.abs(sw)*h*.02:0;
-    hip=P(F.x,F.y-h*.45-bob);sh=P(hip.x,hip.y-h*.32);head=P(sh.x+face*h*.02,sh.y-h*.13);
-    const st=walking?h*.15*sw:h*.07;
-    feet=[P(F.x+u.x*st,F.y+u.y*st),P(F.x-u.x*st,F.y-u.y*st)];
-    const kb=P(face*h*.04,0);bends=[kb,kb];
-    const a=o.arms||'side';
-    if(a==='head')hands=[P(sh.x-h*.12,sh.y-h*.22),P(head.x+h*.02,head.y+h*.02)];
-    else if(a==='behind')hands=[P(sh.x-face*h*.1,head.y+h*.03),P(sh.x+face*h*.16*sw,sh.y+h*.28)];
-    else if(a==='swing')hands=[P(sh.x+face*h*.14*sw,sh.y+h*.3),P(sh.x-face*h*.14*sw,sh.y+h*.3)];
-    else{const b=Math.sin(S.phase*1.5)*h*.01;hands=[P(sh.x-h*.15,sh.y+h*.27+b),P(sh.x+h*.15,sh.y+h*.27-b)];}
-  }
-  ctx.strokeStyle=C.ink;ctx.lineWidth=lw;
-  feet.forEach((ft,i)=>limb(hip,ft,bends[i]));
-  ctx.lineWidth=h*.12;ctx.beginPath();ctx.moveTo(hip.x,hip.y);ctx.lineTo(sh.x,sh.y);ctx.stroke();
-  ctx.strokeStyle=C.clay;ctx.lineWidth=1.2;
-  ctx.beginPath();ctx.moveTo(hip.x-h*.05,hip.y-h*.03);ctx.lineTo(hip.x+h*.05,hip.y-h*.06);ctx.stroke();
-  ctx.strokeStyle=C.ink;ctx.lineWidth=lw;
-  hands.forEach(hd=>limb(sh,hd,P(0,h*.04)));
-  ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(head.x,head.y,h*.085,0,7);ctx.fill();
-  const fx=face;
-  if(o.beard!==false){ctx.beginPath();ctx.moveTo(head.x+fx*h*.02,head.y+h*.04);ctx.lineTo(head.x+fx*h*.1,head.y+h*.12);ctx.lineTo(head.x+fx*h*.08,head.y+h*.02);ctx.fill();}
-  ctx.fillStyle=C.clay;ctx.beginPath();ctx.arc(head.x+fx*h*.04,head.y-h*.015,Math.max(1,h*.012),0,7);ctx.fill();
-  ctx.strokeStyle=C.clay;ctx.lineWidth=Math.max(1,h*.012);ctx.beginPath();
-  const mx=head.x+fx*h*.045,my=head.y+h*.035,mr=h*.025;
-  if(o.mood==='smile')ctx.arc(mx,my-mr*.6,mr,.3,Math.PI-.3);
-  else if(o.mood==='frown')ctx.arc(mx,my+mr*.9,mr,Math.PI+.4,-.4);
-  else{ctx.moveTo(mx-mr*.8,my);ctx.lineTo(mx+mr*.8,my);}
-  ctx.stroke();
-  if(o.wreath){ctx.fillStyle=C.bone;
-    for(let i=0;i<5;i++){const a=Math.PI*(1.1+i*.2);ctx.beginPath();ctx.ellipse(head.x+Math.cos(a)*h*.09,head.y+Math.sin(a)*h*.09,h*.035,h*.015,a+Math.PI/2,0,7);ctx.fill();}}
-  if(o.sweat){ctx.fillStyle=C.bone;const t=(S.phase*2)%1;
-    ctx.globalAlpha=1-t;ctx.beginPath();ctx.ellipse(head.x-fx*h*.1,head.y-h*.04+t*h*.15,1.6,2.6,0,0,7);ctx.fill();ctx.globalAlpha=1;}
-  if(o.notes){ctx.fillStyle=C.ink;ctx.font=`700 ${Math.max(11,h*.16)}px ${FONT}`;ctx.textAlign='left';
-    for(let i=0;i<2;i++){const t=(S.phase*.8+i*.5)%1;ctx.globalAlpha=1-t;ctx.fillText(i?'♫':'♪',head.x+fx*h*(.14+t*.15),head.y-h*(.05+t*.3));}
-    ctx.globalAlpha=1;}
-  ctx.restore();
-  return head;
-}
-
-function mood(){if(S.zen)return 'smile';if(S.despair>=60&&S.showMeter)return 'frown';return S.mode==='title'?'flat':'flat';}
-function actors(){
-  if(S.finale){
-    const pushing=S.st==='fpush';
-    figure({F:pt(S.fs),pose:pushing?'push':S.walking?'walk':'stand',face:S.walking?-1:1,walk:S.walk,arms:S.walking?'swing':'head',
-      beard:false,wreath:true,mood:pushing&&S.f>.6?'frown':'flat',sweat:pushing&&S.f>.5,squash:S.st==='roll'?S.squash:0});
-    const kicking=S.kick>.08&&S.kickFrom==='sis';
-    const Fs={x:g.x1+g.R*1.1,y:g.yt,ux:1,uy:0};
-    S._head=figure({F:Fs,pose:kicking?'kick':'stand',face:-1,target:S.kickPt,arms:'side',mood:'smile',notes:!kicking&&S.st!=='fpush'});
-    return;
-  }
-  const F=pt(S.fs);let o;
-  if(S.st==='push')o={pose:'push',sweat:S.f>.6&&!S.zen};
-  else if(S.st==='strike')o={pose:'sit',sign:S.sign};
-  else if(S.st==='roll'){
-    if(S.walking)o={pose:'walk',face:-1,arms:S.zen?'behind':'swing',notes:S.zen};
-    else o={pose:'stand',arms:S.zen?'side':'head',squash:S.squash};
-  }else o={pose:'stand',arms:'side',notes:S.zen};
-  S._head=figure(Object.assign({F,walk:S.walk,mood:mood()},o));
-}
-
-function foot(){
-  if(S.kick<=0||S.kickFrom!=='sky')return;
-  const t=1-S.kick/.38;
-  const reach=t<.35?t/.35:(t<.6?1:1-(t-.6)/.4);
-  const c=center(Math.max(S.f,.0)),R=g.R;
-  const tip={x:c.x+R*1.15,y:c.y-R*.35};
-  const far={x:tip.x+R*5,y:tip.y-R*6};
-  const e=1-Math.pow(1-reach,3);
-  const p={x:far.x+(tip.x-far.x)*e,y:far.y+(tip.y-far.y)*e};
-  ctx.save();ctx.strokeStyle=C.ink;ctx.fillStyle=C.ink;ctx.lineCap='round';
-  ctx.lineWidth=R*.8;ctx.beginPath();ctx.moveTo(p.x+R*7,p.y-R*8);ctx.lineTo(p.x+R*.6,p.y-R*.8);ctx.stroke();
-  ctx.beginPath();ctx.ellipse(p.x,p.y,R*.95,R*.42,-.75,0,7);ctx.fill();
-  ctx.strokeStyle=C.clay;ctx.lineWidth=1.5;
-  for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(p.x+R*(.5+i*.5),p.y-R*(.5+i*.6)-R*.3);ctx.lineTo(p.x+R*(.9+i*.5),p.y-R*(.1+i*.6)-R*.3);ctx.stroke();}
-  if(t<.45){ctx.strokeStyle=C.ink;ctx.lineWidth=2;
-    for(let i=0;i<5;i++){const a=Math.PI*.9+i*.25;ctx.beginPath();ctx.moveTo(c.x+Math.cos(a)*R*1.4,c.y+Math.sin(a)*R*1.4);ctx.lineTo(c.x+Math.cos(a)*R*2.1,c.y+Math.sin(a)*R*2.1);ctx.stroke();}}
-  ctx.restore();
-}
-
-function bubble(){
-  const b=S.bubble,hd=S._head;if(!b||!hd)return;
-  const fs=Math.max(12,Math.min(16,g.R*.6));
-  ctx.save();ctx.font=`700 ${fs}px ${FONT}`;
-  const tw=ctx.measureText(b.t).width,pw=tw+fs*1.1,ph=fs*1.9;
-  let x=hd.x-pw*.35,y=hd.y-g.R*1.1-ph;
-  x=Math.max(6,Math.min(W-pw-6,x));y=Math.max(g.band*2+4,y);
-  ctx.globalAlpha=Math.min(1,b.life*4);
-  ctx.fillStyle=C.bone;ctx.strokeStyle=C.ink;ctx.lineWidth=2;
-  ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,pw,ph,6):ctx.rect(x,y,pw,ph);ctx.fill();ctx.stroke();
-  ctx.beginPath();const tx=Math.max(x+8,Math.min(x+pw-18,hd.x-4));
-  ctx.moveTo(tx,y+ph-1);ctx.lineTo(tx+10,y+ph-1);ctx.lineTo(hd.x+2,hd.y-g.R*.35);ctx.closePath();ctx.fill();
-  ctx.beginPath();ctx.moveTo(tx,y+ph);ctx.lineTo(hd.x+2,hd.y-g.R*.35);ctx.lineTo(tx+10,y+ph);ctx.stroke();
-  ctx.fillStyle=C.ink;ctx.textBaseline='middle';ctx.textAlign='left';ctx.fillText(b.t,x+fs*.55,y+ph/2+1);
-  ctx.restore();
-}
-
-function overlays(){
-  const s=S.step;
-  if(S.mode==='story'&&s&&s.t==='play'&&S.st==='push'&&S.showMeter&&!S.zen){
-    const p=pt(.85);ctx.save();ctx.strokeStyle=C.ink;ctx.setLineDash([4,4]);ctx.lineWidth=1.5;
-    ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+g.uy*g.R*3.2,p.y-g.ux*g.R*3.2);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle=C.ink;ctx.font=`700 ${Math.max(10,g.R*.45)}px ${FONT}`;ctx.textAlign='center';
-    ctx.fillText('倍率线',p.x+g.uy*g.R*3.7,p.y-g.ux*g.R*3.7);ctx.restore();
-  }
-  S.dust.forEach(d=>{ctx.globalAlpha=Math.min(1,d.life*2);ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,7);ctx.fill();});
-  ctx.globalAlpha=1;
-  S.popups.forEach(p=>{
-    ctx.save();ctx.globalAlpha=Math.min(1,p.life*2);
-    const fs=Math.max(p.small?11:13,g.R*(p.hot?.75:p.small?.45:.6));ctx.font=`900 ${fs}px ${FONT}`;ctx.textAlign='center';
-    const tw=ctx.measureText(p.t).width/2+8;
-    const x=Math.max(tw,Math.min(W-tw,p.x));
-    ctx.lineWidth=p.small?3:4;ctx.strokeStyle=C.ink;ctx.strokeText(p.t,x,p.y);
-    ctx.fillStyle=p.hot?C.gold:p.small?(p.good?C.gold:C.bone):C.bone;ctx.fillText(p.t,x,p.y);ctx.restore();
-  });
-  if(S.flash>0){ctx.fillStyle=C.bone;ctx.globalAlpha=S.flash*.8;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;}
-}
-
-function draw(){
-  ctx.save();
-  if(S.shake>0){const k=S.shake*30;ctx.translate((Math.random()-.5)*k,(Math.random()-.5)*k);}
-  scene();book();actors();boulder();foot();overlays();bubble();
-  ctx.restore();
-}
-
-// ---------- sound ----------
-let ac=null,sound=true;
-try{sound=localStorage.getItem('sisyphus-sound')!=='0'}catch(e){}
-function syncSound(){$('btnSound').textContent='声音：'+(sound?'开':'关');$('btnSound').setAttribute('aria-pressed',sound);}
-syncSound();
-function tone(type,freqs,step,vol,len){
-  const t=ac.currentTime,o=ac.createOscillator(),gn=ac.createGain();
-  o.type=type;o.connect(gn);gn.connect(ac.destination);
-  freqs.forEach((f,i)=>o.frequency.setValueAtTime(f,t+i*step));
-  gn.gain.setValueAtTime(vol,t);gn.gain.exponentialRampToValueAtTime(.001,t+len);o.start(t);o.stop(t+len+.02);
-  return o;
-}
-function sfx(kind){
-  if(!sound||!ac)return;
-  const t=ac.currentTime;
-  if(kind==='kick'){const o=tone('triangle',[180],0,.35,.22);o.frequency.exponentialRampToValueAtTime(45,t+.18);}
-  else if(kind==='land'){const o=tone('sine',[70],0,.4,.35);o.frequency.exponentialRampToValueAtTime(30,t+.3);}
-  else if(kind==='zen')tone('sine',[392,494,587,784],.22,.12,1.1);
-  else if(kind==='gong'){const o=tone('sine',[110],0,.22,1.4);o.frequency.exponentialRampToValueAtTime(98,t+1.2);}
-  else if(kind==='pop')tone('square',[520,780],.06,.06,.16);
-  else if(kind==='tick')tone('triangle',[880],0,.04,.05);
-  else if(kind==='step')tone('triangle',[140],0,.12,.08);
-}
-function ensureAudio(){if(!sound)return;if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(ac&&ac.state==='suspended')ac.resume();}
-
-// ---------- input ----------
-function begin(){
-  ensureAudio();$('ovTitle').hidden=true;$('ovEnd').hidden=true;
-  reset('story');S.st='idle';go(0);
-}
-$('btnStart').addEventListener('click',e=>{e.stopPropagation();begin();});
-$('btnAgain').addEventListener('click',e=>{e.stopPropagation();begin();});
-$('btnSound').addEventListener('click',()=>{sound=!sound;try{localStorage.setItem('sisyphus-sound',sound?'1':'0')}catch(e){}syncSound();if(sound)ensureAudio();});
-document.querySelectorAll('.card').forEach(c=>c.addEventListener('pointerdown',e=>e.stopPropagation()));
-cvs.addEventListener('pointerdown',e=>{e.preventDefault();tap();});
-$('chapCard').addEventListener('pointerdown',e=>{e.preventDefault();tap();});
-$('dlg').addEventListener('pointerdown',e=>{e.preventDefault();tap();});
-addEventListener('keydown',e=>{
-  if((e.code==='Space'||e.code==='Enter')&&S.mode==='story'&&!(e.target instanceof HTMLButtonElement)){e.preventDefault();tap();}
-});
-
-// ---------- loop ----------
-resize();reset('title');say('嘿咻。',1.5);
-let last=performance.now();
-function loop(now){
-  const dt=Math.min(.05,(now-last)/1000);last=now;
-  if(W>0)update(dt);draw();requestAnimationFrame(loop);
-}
-requestAnimationFrame(loop);
-})();
-</script>
 </body>
 </html>

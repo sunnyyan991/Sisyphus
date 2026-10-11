@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="诸神的差事第二集：你顶班当宙斯的鹰，啄普罗米修斯的肝。">
+<title>普罗米修斯，四种说法</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+/* Layout: same black-figure vase panel as the series — HUD rim above, painted scene as the stage, dialogue scroll below. Single deliberate terracotta look that fades as the gods forget. */
+:root{
+  --clay:#c96a32;
+  --clay-deep:#ad5527;
+  --clay-light:#dc8a52;
+  --ink:#1b1410;
+  --bone:#f3e2c7;
+  --gold:#e8b04f;
+  --display:"Noto Serif SC","Songti SC","STSong",serif;
+  --body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  color-scheme:light;
+}
+[hidden]{display:none!important}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{background:var(--clay);color:var(--ink);font-family:var(--body);margin:0;overflow:hidden}
+.app{height:100%;max-width:980px;margin:0 auto;padding-inline:16px;padding-block:12px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 20px}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(22px,4.6vw,34px);margin:0;letter-spacing:.04em;line-height:1.1;text-wrap:balance}
+h1 small{display:block;font-family:var(--body);font-weight:500;font-size:12px;letter-spacing:.18em;opacity:.75;margin-top:4px}
+.hud{display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat span{font-size:11px;letter-spacing:.14em;opacity:.75}
+.stat b{font-family:var(--display);font-size:22px;font-variant-numeric:tabular-nums;line-height:1}
+.stat b.chap{font-size:17px;letter-spacing:.06em}
+.stage{flex:1;min-height:240px;min-width:0;position:relative;border:3px solid var(--ink);border-radius:3px;overflow:hidden;touch-action:manipulation;cursor:pointer;user-select:none;-webkit-user-select:none}
+canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(27,20,16,.55)}
+.card{background:var(--ink);color:var(--bone);border:2px solid var(--bone);outline:3px solid var(--ink);padding:22px 22px 20px;max-width:400px;width:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;cursor:default}
+.card h2{font-family:var(--display);font-weight:900;font-size:24px;margin:0;letter-spacing:.06em;text-wrap:balance}
+.card p{margin:0;line-height:1.7;font-size:14px;opacity:.92}
+.card .q{font-family:var(--display);font-size:14px;opacity:.85;border-top:1px solid rgba(243,226,199,.25);padding-top:10px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.chapcard{background:transparent;pointer-events:none;flex-direction:column;gap:6px;color:var(--bone);text-align:center;animation:chapIn .5s ease-out}
+.chapcard .n{font-family:var(--display);font-size:14px;letter-spacing:.5em;padding-left:.5em;opacity:.85}
+.chapcard .t{font-family:var(--display);font-weight:900;font-size:clamp(40px,9vw,72px);letter-spacing:.2em;padding-left:.2em;line-height:1.1;text-shadow:0 3px 0 var(--ink)}
+.chapcard .rule{width:min(260px,60%);height:8px;border-block:2px solid var(--bone);margin-top:6px}
+@keyframes chapIn{from{opacity:0;transform:translateY(8px)}}
+button,.btn{font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:.12em;background:var(--clay);color:var(--ink);border:2px solid var(--bone);padding:10px 20px;border-radius:2px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.ghost{background:transparent;color:var(--bone);font-size:14px;padding:8px 14px}
+button:hover,.btn:hover{background:var(--gold);color:var(--ink)}
+button:focus-visible,.btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.dlg{position:relative;min-height:84px;background:var(--ink);color:var(--bone);border:2px solid var(--ink);box-shadow:inset 0 0 0 2px var(--bone);padding:12px 18px 14px;box-sizing:border-box;display:flex;flex-direction:column;gap:4px;cursor:pointer;user-select:none;-webkit-user-select:none}
+.dlg .who{font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.18em;color:var(--gold);min-height:1.2em}
+.dlg .who small{font-family:var(--body);font-weight:400;font-size:11px;letter-spacing:.08em;color:var(--bone);opacity:.6;margin-left:8px}
+.dlg .txt{font-family:var(--display);font-weight:700;font-size:clamp(15px,2.2vw,18px);line-height:1.6;min-width:0;padding-right:28px}
+.dlg.narr .txt{font-weight:400;opacity:.85;letter-spacing:.08em}
+.dlg.hint .txt{font-family:var(--body);font-weight:400;font-size:14px;opacity:.7;letter-spacing:.06em}
+.dlg .more{position:absolute;right:14px;bottom:10px;font-size:12px;color:var(--gold);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;opacity:.85;flex-wrap:wrap}
+.foot button{font-family:var(--body);font-size:12px;letter-spacing:.06em;padding:4px 10px;background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.foot button:hover{background:var(--clay-light)}
+header,.dlg,.foot{transition:opacity 3s ease}
+body.quiet header,body.quiet .dlg,body.quiet .foot{opacity:.12}
+@media (max-width:480px){.stat b{font-size:18px}.hud{gap:12px}.dlg{min-height:96px}}
+@media (prefers-reduced-motion:reduce){.chapcard,.dlg .more{animation:none}header,.dlg,.foot{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>普罗米修斯，四种说法<small>诸神的差事 · 第二集</small></h1>
+    <div class="hud">
+      <div class="stat"><span id="lblChap">章节</span><b class="chap" id="chap">序</b></div>
+      <div class="stat"><span id="lblPeck">啄了</span><b id="pecks">0</b></div>
+      <div class="stat"><span id="lblScore">绩效</span><b id="score">0</b></div>
+    </div>
+  </header>
+
+  <div class="stage" id="stage">
+    <canvas id="c"></canvas>
+    <div class="overlay chapcard" id="chapCard" hidden><div class="n" id="chapN">传说之一</div><div class="t" id="chapT">锁链</div><div class="rule"></div></div>
+    <div class="overlay" id="ovTitle">
+      <div class="card">
+        <h2>你又被调岗了</h2>
+        <p>上一份差事是踹石头。这一次，宙斯的鹰辞职了，由你去顶班。</p>
+        <p>点画面或按空格啄一口，对话也是点一下翻页。全程大约五分钟。</p>
+        <div class="row"><button id="btnStart">穿上制服</button></div>
+      </div>
+    </div>
+    <div class="overlay" id="ovEnd" hidden>
+      <div class="card">
+        <h2>完</h2>
+        <p id="endText"></p>
+        <p class="q">传说想要解释那无法解释的东西。它从真实中来，所以最后也只能落在无法解释上。——卡夫卡《普罗米修斯》（大意）</p>
+        <div class="row"><button id="btnAgain">从头再来</button><a class="btn ghost" href="https://sunnyyan991.github.io/Sisyphus/">回到诸神的差事</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dlg hint" id="dlg" role="status" aria-live="polite">
+    <div class="who" id="who"></div>
+    <div class="txt" id="txt">高加索山。风很大。</div>
+    <div class="more" id="more" hidden>▼</div>
+  </div>
+
+  <div class="foot">
+    <span>灵感来自希腊神话与卡夫卡《普罗米修斯》。</span>
+    <button id="btnSound" type="button" aria-pressed="true">声音：开</button>
+  </div>
+</div>
+
+<script>
+(()=>{
+const C={clay:'#c96a32',deep:'#ad5527',light:'#dc8a52',ink:'#1b1410',bone:'#f3e2c7',gold:'#e8b04f',rock:'#9e4b23',far:'#bd6230',grey:'#8a7a68'};
+const FONT='"Noto Serif SC","Songti SC",serif';
+const cvs=document.getElementById('c'),ctx=cvs.getContext('2d'),stage=document.getElementById('stage');
+const $=id=>document.getElementById(id);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W=0,H=0,g={};
+
+function resize(){
+  const r=stage.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);
+  W=r.width;H=r.height;if(!W||!H)return;
+  cvs.width=Math.round(W*dpr);cvs.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+  const band=Math.max(10,Math.min(22,H*.05));
+  const R=Math.max(11,Math.min(W*.038,H*.06));
+  const gy=H-band*1.6-H*.04;
+  const cliffTop=band*2.2+H*.08;
+  const ledgeY=gy-H*.16;
+  const h=R*4;
+  g={band,R,h,gy,cliffTop,ledgeY,cxTop:W*.56,cxBot:W*.5,px:Math.max(W*.72,W*.56+h*.7),tx:W*.17,perchY:gy-H*.38};
+}
+if('ResizeObserver' in window)new ResizeObserver(()=>resize()).observe(stage);
+else addEventListener('resize',resize);
+
+const lerp=(a,b,t)=>a+(b-a)*t;
+function mix(a,b,t){const p=s=>[1,3,5].map(i=>parseInt(s.slice(i,i+2),16));const A=p(a),B=p(b);
+  return 'rgb('+A.map((v,i)=>Math.round(lerp(v,B[i],t))).join(',')+')';}
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+
+// ---------- the script ----------
+const WHO={
+  H:[['赫尔墨斯','冥界人事部'],['赫……什么斯','冥界……某部']],
+  P:[['普罗米修斯','受罚者'],['？？？','大概是受罚者']],
+  E:[['你','鹰（外包）'],['你','大概是鹰']],
+  M:[['路人','人类'],['路人','人类']],
+  N:[['',''],['','']]
+};
+const SCRIPT=[
+  {t:'chapter',n:'序章',title:'轮岗'},
+  {t:'say',who:'H',text:'推石头的工作还顺利吗？'},
+  {t:'say',who:'H',text:'不重要。你又被调岗了。'},
+  {t:'say',who:'H',text:'宙斯的鹰辞职了，说是工伤。这个岗位现在外包，由你顶班。'},
+  {t:'do',fn:()=>{S.eagleOn=true;const e=eaglePerch();burst(e.x,e.y,10);sfx('pop');}},
+  {t:'say',who:'N',text:'你穿上了鹰的制服。尺码偏小。'},
+  {t:'say',who:'H',text:'关于这份工作，有四种说法。'},
+  {t:'say',who:'P',text:'四种？明明是一件事的四个阶段。'},
+  {t:'say',who:'H',text:'翻译问题。'},
+  {t:'say',who:'H',text:'先从第一种开始吧。'},
+
+  {t:'chapter',n:'传说之一',title:'锁链'},
+  {t:'say',who:'N',text:'他把火偷给了人类，被锁在高加索山的悬崖上。'},
+  {t:'say',who:'H',text:'他的肝会一直长回来。长满了，你就去啄一口。'},
+  {t:'say',who:'H',text:'点屏幕就是一口。别啄早了，也别放到过期。'},
+  {t:'say',who:'P',text:'你好，新来的鹰。我叫普罗米修斯，意思是“先见之明”。'},
+  {t:'say',who:'P',text:'你每一口怎么啄，我都会提前告诉你。'},
+  {t:'play',n:3,grow:3.4,hint:'等肝长满再啄。他会预言你怎么啄，你可以不听他的。',
+    prophecy:[{say:'这一口，你会等它长满。',expect:'full'},{say:'这一口，你会忍不住，啄早了。',expect:'early'},{say:'这一口……你会让它放过期。',expect:'late'}]},
+  {t:'say',who:'P',text:()=>S.prophHits>=2?'看吧，先见之明。我只是没预见到你穿的是中号。':'……我的先见之明可能需要保养了。'},
+
+  {t:'chapter',n:'传说之二',title:'岩石'},
+  {t:'say',who:'H',text:'宙斯收到反馈：他太能聊了。'},
+  {t:'say',who:'H',text:'所以从现在起，你每啄一口，他就往岩石里陷一点。'},
+  {t:'say',who:'P',text:'这个我早就预见到了。只是没预见到会这么硌。'},
+  {t:'play',n:3,grow:3.2,sink:true,hint:'继续啄。每一口，他都会更像这座山。',
+    lines:{start:['（往里挪了挪）','这个姿势其实挺稳的。','（闷声）嗯。'],pecked:['硌。','我的左半边已经是花岗岩了。','（闷声）嗯嗯嗯嗯。']}},
+  {t:'say',who:'P',text:'（闷声）我现在是山的一部分了。你可以叫我山。'},
+  {t:'say',who:'H',text:'宙斯问，山还需要啄吗？'},
+  {t:'say',who:'H',text:'……先啄着吧。流程上没说停。'},
+
+  {t:'chapter',n:'传说之三',title:'遗忘'},
+  {t:'say',who:'N',text:'几千年过去了。'},
+  {t:'do',fn:()=>{S.forget=true;S.fog=.12;hud();}},
+  {t:'say',who:'H',text:'我来是想说……'},
+  {t:'say',who:'H',text:'……'},
+  {t:'say',who:'H',text:'算了，想起来再说。'},
+  {t:'say',who:'N',text:'一个举着火把的人类路过。'},
+  {t:'do',fn:()=>{S.human={x:-g.R*3,target:W*.34,walk:0};}},
+  {t:'wait',d:2.2},
+  {t:'say',who:'M',text:'请问，下山怎么走？'},
+  {t:'say',who:'E',text:'他……为你们偷了火。'},
+  {t:'say',who:'M',text:'火？我们一直都有啊。'},
+  {t:'do',fn:()=>{S.human.target=-g.R*4;}},
+  {t:'say',who:'P',text:'刚才那是谁？'},
+  {t:'say',who:'P',text:'还有……我是谁？'},
+  {t:'say',who:'E',text:'……我好像是一只鹰？'},
+  {t:'play',n:2,grow:3.6,hint:'你好像是来干什么的。点一下试试。',
+    lines:{start:['……','你是来干什么的？'],pecked:['哦，对，是这个。','你为什么要啄我？……算了，不重要。']}},
+
+  {t:'chapter',n:'传说之四',title:'疲倦'},
+  {t:'say',who:'N',text:'后来，大家都累了。'},
+  {t:'do',fn:()=>{S.tired=true;S.fog=.22;}},
+  {t:'say',who:'H',text:'宙斯累了。我也累了。'},
+  {t:'say',who:'H',text:'这是一张撤销惩罚的申请表，你帮我……'},
+  {t:'say',who:'H',text:'……我明天再来填。'},
+  {t:'say',who:'N',text:'赫尔墨斯没有再来。'},
+  {t:'say',who:'P',text:'我的伤口也累了。它说它不想再长了，但它还是长了。'},
+  {t:'play',n:2,grow:6.5,hint:'点一下。你的翅膀有点沉，会慢一点。',
+    lines:{start:['（哈欠）','……'],pecked:['……啊。','……嗯。长回来好累。']}},
+  {t:'say',who:'P',text:'你还啄吗？'},
+  {t:'say',who:'E',text:'……你还长吗？'},
+  {t:'say',who:'P',text:'……'},
+  {t:'say',who:'N',text:'伤口合上了。因为累了。'},
+
+  {t:'mountain'},
+  {t:'end'}
+];
+
+// ---------- state ----------
+const S={};
+function reset(mode){
+  Object.assign(S,{mode,si:-1,step:null,st:mode==='title'?'grow':'idle',g:mode==='title'?.3:1,over:0,overWarned:false,growTime:3.4,
+    pecks:0,fresh:0,score:0,combo:0,prophHits:0,peck:null,sinkT:0,sinkV:0,forget:false,tired:false,fog:0,fogV:0,vanish:0,
+    eagleOn:mode==='title',human:null,bubble:null,popups:[],dust:[],phase:0,ri:0,left:0,lines:null,prophecy:null,curProph:null,
+    wait:0,chapT:0,typing:false,tw:0,full:'',mt:null,heads:{},eFlap:0});
+}
+function say(who,t,dur=1.9){S.bubble={who,t,life:dur};}
+
+// ---------- dialogue panel ----------
+function setHint(text){$('dlg').className='dlg hint';$('who').textContent='';$('txt').textContent=text||'';$('more').hidden=true;S.typing=false;}
+function showLine(who,text){
+  $('dlg').className='dlg'+(who==='N'?' narr':'');
+  const w=WHO[who][S.forget?1:0];$('who').innerHTML=w[0]?`${w[0]}<small>${w[1]}</small>`:'';
+  S.full=text;S.tw=0;S.typing=!reduce;$('txt').textContent=reduce?text:'';$('more').hidden=S.typing;
+}
+function finishTyping(){S.typing=false;$('txt').textContent=S.full;$('more').hidden=false;}
+
+// ---------- runner ----------
+function go(i){
+  S.si=i;const s=SCRIPT[i];S.step=s;$('chapCard').hidden=true;
+  switch(s.t){
+    case 'chapter':
+      $('chapN').textContent=s.n;$('chapT').textContent=s.title;$('chapCard').hidden=false;
+      S.chapName=s.n+' · '+s.title;S.chapT=0;setHint('');sfx('gong');break;
+    case 'say':showLine(s.who,typeof s.text==='function'?s.text():s.text);break;
+    case 'do':s.fn();go(i+1);return;
+    case 'wait':S.wait=s.d;setHint('');break;
+    case 'play':setHint(s.hint);S.left=s.n;S.ri=0;S.lines=s.lines||null;S.prophecy=s.prophecy||null;S.growTime=s.grow;S.sinking=!!s.sink;S.combo=0;startRound();break;
+    case 'mountain':
+      setHint('');S.st='idle';S.fog=.32;S.mt={t:0,taps:0,textOn:false,tt:0,textA:0,rock:null,done:false};
+      document.body.classList.add('quiet');sfx('wind');break;
+    case 'end':
+      S.mode='end';
+      $('endText').textContent=`第二份差事结束。你啄了 ${S.pecks} 口，其中新鲜的 ${S.fresh} 口。这些数字已经没有人记得了。`;
+      $('ovEnd').hidden=false;$('btnAgain').focus();break;
+  }
+  hud();
+}
+const next=()=>go(S.si+1);
+
+function hud(){
+  const f=S.forget;
+  $('lblChap').textContent=f?'章……？':'章节';
+  $('lblPeck').textContent=f?'啄了……几口？':'啄了';
+  $('lblScore').textContent=f?'那个数':'绩效';
+  $('chap').textContent=S.mode==='story'||S.mode==='end'?(f?'传说之？ · ？？':(S.chapName||'序')):'序';
+  $('pecks').textContent=f?'？':S.pecks;
+  $('score').textContent=f?'？':S.score;
+}
+
+// ---------- actions ----------
+function startRound(){
+  S.st='grow';S.g=0;S.over=0;S.overWarned=false;
+  if(S.mode!=='story')return;
+  if(S.prophecy){S.curProph=S.prophecy[S.ri%S.prophecy.length];say('P',S.curProph.say,2.8);}
+  else if(S.lines&&S.lines.start)say('P',S.lines.start[S.ri%S.lines.start.length],1.6);
+}
+function requestPeck(){
+  if(S.st!=='grow'||S.peck||!S.eagleOn)return;
+  if(S.tired){say('E','（哈欠）',1.3);S.peck={t:0,dur:1.7,delay:1.1,hit:false};}
+  else{S.peck={t:0,dur:.95,delay:0,hit:false};sfx('whoosh');}
+}
+function impact(){
+  const L=liverPt();
+  const q=S.g<.92?'early':(S.over>=2.2?'late':'full');
+  S.pecks++;burst(L.x,L.y,12);S.shake=reduce?0:.16;sfx('peck');
+  if(S.mode==='story'){
+    let pts,label;
+    if(q==='full'){S.combo++;S.fresh++;pts=100*S.combo;label=S.combo>1?`新鲜 ×${S.combo}  +${pts}`:`新鲜  +${pts}`;}
+    else if(q==='early'){S.combo=0;pts=Math.round(S.g*40);label=`返工  +${pts}`;}
+    else{S.combo=0;pts=20;label='过期了  +20';}
+    S.score+=pts;
+    S.popups.push({x:L.x,y:L.y-g.R*1.6,t:S.forget?'？':label,life:1.4,hot:q==='full'});
+    if(S.curProph){
+      const hit=S.curProph.expect===q;if(hit)S.prophHits++;
+      say('P',hit?pick(['我说什么来着。','先见之明，名不虚传。']):pick(['……先见之明出 bug 了。','这不可能。我再算算。']),2);
+      S.curProph=null;
+    }else if(q==='early')say('P',S.sinkV>.6?'（闷声）还没长好。':'还没长好呢。',1.6);
+    else if(q==='late')say('P','它都放了一会儿了。',1.6);
+    else if(S.lines)say('P',S.lines.pecked[S.ri%S.lines.pecked.length],1.8);
+    if(S.sinking)S.sinkT=Math.min(1,S.sinkT+1/3);
+  }
+  S.g=0;S.over=0;S.st='back';hud();
+}
+function roundDone(){
+  if(S.mode==='title'){startRound();return;}
+  S.ri++;S.left--;
+  if(S.left>0)startRound();else{S.st='idle';next();}
+}
+function mountainTap(x,y){
+  if(!S.mt)return;S.mt.taps++;
+  S.dust.push(...Array.from({length:reduce?2:6},()=>({x,y,vx:(Math.random()-.5)*60,vy:-Math.random()*60,life:.6,r:1.5+Math.random()*2})));
+  sfx('tick');
+}
+function tap(e){
+  if(S.mode!=='story')return;
+  ensureAudio();
+  const s=S.step;if(!s)return;
+  if(s.t==='say'){if(S.typing)finishTyping();else{sfx('tick');next();}}
+  else if(s.t==='chapter'){if(S.chapT>.5)next();}
+  else if(s.t==='play')requestPeck();
+  else if(s.t==='mountain'){
+    let x=W/2,y=H/2;
+    if(e&&e.clientX!=null&&e.currentTarget===cvs){const r=cvs.getBoundingClientRect();x=e.clientX-r.left;y=e.clientY-r.top;}
+    mountainTap(x,y);
+  }
+}
+function burst(x,y,n){
+  if(reduce)n=Math.ceil(n/3);
+  for(let i=0;i<n;i++){const a=-Math.PI*Math.random();const sp=40+Math.random()*110;
+    S.dust.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:.5+Math.random()*.4,r:1.5+Math.random()*2.5});}
+}
+
+// ---------- geometry ----------
+function cliffX(y){const t=(y-g.cliffTop)/(H-g.cliffTop);return lerp(g.cxTop,g.cxBot,t)+Math.sin(y*.05)*g.R*.25;}
+function liverPt(){return {x:g.px-g.h*.07,y:g.ledgeY-g.h*.56};}
+function eaglePerch(){return {x:g.tx+g.R*.4,y:g.perchY-g.R*.5};}
+function eagleTarget(){const L=liverPt();return {x:L.x-g.R*1.25,y:L.y+g.R*.3};}
+function eaglePos(){
+  const A=eaglePerch();
+  if(!S.peck||S.peck.delay>0)return {x:A.x,y:A.y,fly:0};
+  const B=eagleTarget(),t=S.peck.t;
+  const cx=(A.x+B.x)/2,cy=Math.min(A.y,B.y)-H*.14;
+  let u,jab=0;
+  if(t<.4)u=1-Math.pow(1-t/.4,2);
+  else if(t<.55){u=1;jab=Math.sin((t-.4)/.15*Math.PI);}
+  else{const k=(t-.55)/.45;u=Math.pow(1-k,2);}
+  const x=(1-u)*(1-u)*A.x+2*(1-u)*u*cx+u*u*B.x+jab*g.R*.35;
+  const y=(1-u)*(1-u)*A.y+2*(1-u)*u*cy+u*u*B.y;
+  return {x,y,fly:t<.4||t>.55?1:.4,back:t>.55};
+}
+
+// ---------- update ----------
+function update(dt){
+  S.phase+=dt;
+  const s=S.step;
+  if(S.mode==='story'&&s){
+    if(s.t==='chapter'){S.chapT+=dt;if(S.chapT>2.2)next();}
+    if(s.t==='wait'){S.wait-=dt;if(S.wait<=0)next();}
+  }
+  if(S.typing){S.tw+=dt*34;const n=Math.floor(S.tw);$('txt').textContent=S.full.slice(0,n);if(n>=S.full.length)finishTyping();}
+  if(S.st==='grow'){
+    S.g=Math.min(1,S.g+dt/S.growTime);
+    if(S.g>=1){S.over+=dt;
+      if(S.over>=2.2&&!S.overWarned){S.overWarned=true;const L=liverPt();S.popups.push({x:L.x,y:L.y-g.R*1.2,t:'快过期了',life:1.2,small:true});}}
+    if(S.mode==='title'&&S.g>=1&&S.over>.35)requestPeck();
+  }else if(S.st==='idle'&&S.g<1)S.g=Math.min(1,S.g+dt/5);
+  if(S.peck){
+    const p=S.peck;
+    if(p.delay>0){p.delay-=dt;if(p.delay<=0)sfx('whoosh');}
+    else{p.t+=dt/p.dur;if(!p.hit&&p.t>=.45){p.hit=true;impact();}
+      if(p.t>=1){S.peck=null;roundDone();}}
+  }
+  S.sinkV+=(S.sinkT-S.sinkV)*Math.min(1,dt*2.5);
+  S.fogV+=(S.fog-S.fogV)*Math.min(1,dt*.8);
+  if(S.human){const hm=S.human,d=hm.target-hm.x;
+    if(Math.abs(d)>1){hm.x+=Math.sign(d)*Math.min(Math.abs(d),W*.14*dt);hm.walk+=dt*9;hm.dir=Math.sign(d);}
+    if(hm.x<-g.R*3.5&&hm.target<0)S.human=null;}
+  if(S.mt){
+    const m=S.mt;m.t+=dt;S.vanish=Math.min(1,S.vanish+dt/4);
+    if(S.vanish>=1&&!m.textOn&&(m.taps>=3||m.t>9)){m.textOn=true;m.tt=0;}
+    if(m.textOn){m.tt+=dt;m.textA=Math.min(1,m.tt/1.5);
+      if(m.tt>4&&!m.rock){m.rock={x:-g.R*2};}}
+    if(m.rock&&!m.done){m.rock.x+=W*.11*dt;if(m.rock.x>W+g.R*2){m.done=true;S.mt=null;setTimeout(()=>{if(S.mode==='story')next();},700);}}
+  }
+  if(S.bubble){S.bubble.life-=dt;if(S.bubble.life<=0)S.bubble=null;}
+  S.shake=Math.max(0,(S.shake||0)-dt);
+  S.popups.forEach(p=>{p.life-=dt;p.y-=28*dt;});S.popups=S.popups.filter(p=>p.life>0);
+  S.dust.forEach(d=>{d.life-=dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.vy+=200*dt;});S.dust=S.dust.filter(d=>d.life>0);
+}
+
+// ---------- draw ----------
+function meander(y,h){
+  const s=h,n=Math.ceil(W/s)+1;
+  ctx.save();ctx.strokeStyle=C.ink;ctx.lineWidth=Math.max(2,h*.14);ctx.lineJoin='miter';ctx.beginPath();
+  for(let i=0;i<n;i++){const x=i*s;ctx.moveTo(x,y+s);ctx.lineTo(x,y);ctx.lineTo(x+s*.8,y);ctx.lineTo(x+s*.8,y+s*.62);ctx.lineTo(x+s*.38,y+s*.62);ctx.lineTo(x+s*.38,y+s*.32);}
+  ctx.moveTo(0,y+s);ctx.lineTo(W,y+s);ctx.stroke();ctx.restore();
+}
+function scene(){
+  const grd=ctx.createRadialGradient(W*.35,H*.3,10,W*.35,H*.35,Math.max(W,H)*.85);
+  grd.addColorStop(0,C.light);grd.addColorStop(1,C.clay);ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);
+  meander(g.band*.5,g.band);
+  // distant Caucasus
+  ctx.fillStyle=C.far;ctx.beginPath();ctx.moveTo(0,g.gy);
+  const peaks=[[0,.62],[.08,.5],[.16,.58],[.26,.44],[.36,.56],[.46,.5],[.56,.6]];
+  peaks.forEach(([x,y])=>ctx.lineTo(W*x,H*y));ctx.lineTo(W*.6,g.gy);ctx.closePath();ctx.fill();
+  ctx.strokeStyle=C.deep;ctx.lineWidth=1.5;ctx.stroke();
+  // ground
+  ctx.fillStyle=C.deep;ctx.fillRect(0,g.gy,W,H-g.gy);
+  ctx.strokeStyle=C.ink;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(0,g.gy);ctx.lineTo(W,g.gy);ctx.stroke();
+  // cliff
+  ctx.beginPath();ctx.moveTo(W+5,g.cliffTop);
+  for(let y=g.cliffTop;y<=g.gy+1;y+=6)ctx.lineTo(cliffX(y),y);
+  ctx.lineTo(cliffX(g.gy),H+5);ctx.lineTo(W+5,H+5);ctx.closePath();
+  ctx.fillStyle=C.rock;ctx.fill();ctx.lineWidth=4;ctx.strokeStyle=C.ink;ctx.stroke();
+  ctx.save();ctx.clip();strata(1);ctx.restore();
+  // bottom band
+  ctx.fillStyle=C.ink;ctx.fillRect(0,H-g.band*1.1,W,g.band*1.1);
+  ctx.strokeStyle=C.clay;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,H-g.band*.7);ctx.lineTo(W,H-g.band*.7);ctx.stroke();
+}
+function strata(a){
+  ctx.save();ctx.globalAlpha=a;ctx.strokeStyle=C.deep;ctx.lineWidth=1.6;
+  for(let k=0;k<14;k++){const y=g.cliffTop+k*(H-g.cliffTop)/13;ctx.beginPath();ctx.moveTo(cliffX(y)-4,y);
+    for(let x=cliffX(y);x<W;x+=18)ctx.lineTo(x,y+Math.sin(x*.04+k)*3);ctx.stroke();}
+  ctx.restore();
+}
+function tree(a){
+  ctx.save();ctx.globalAlpha=a;ctx.strokeStyle=C.ink;ctx.lineCap='round';
+  const x=g.tx,b=g.gy,t=g.perchY;
+  ctx.lineWidth=g.R*.45;ctx.beginPath();ctx.moveTo(x,b);ctx.quadraticCurveTo(x+g.R*.4,(b+t)/2,x,t);ctx.stroke();
+  ctx.lineWidth=g.R*.22;
+  ctx.beginPath();ctx.moveTo(x,t+g.R*.1);ctx.lineTo(x+g.R*1.4,t-g.R*.15);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x,(b+t)/2);ctx.lineTo(x-g.R*1.3,(b+t)/2-g.R*1.1);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x+g.R*.2,b-(b-t)*.3);ctx.lineTo(x+g.R*1.2,b-(b-t)*.45);ctx.stroke();
+  ctx.restore();
+}
+function chainTo(a,b,alpha){
+  ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=C.ink;ctx.lineWidth=1.6;
+  const n=Math.max(3,Math.round(Math.hypot(b.x-a.x,b.y-a.y)/7));
+  for(let i=0;i<n;i++){const t=(i+.5)/n;ctx.beginPath();ctx.ellipse(lerp(a.x,b.x,t),lerp(a.y,b.y,t)+Math.sin(S.phase*2+i)*.6,3.2,2,Math.atan2(b.y-a.y,b.x-a.x)+(i%2?Math.PI/2:0),0,7);ctx.stroke();}
+  ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(b.x,b.y,3.5,0,7);ctx.fill();
+  ctx.restore();
+}
+function prometheus(alpha){
+  const x=g.px,fy=g.ledgeY,h=g.h,sk=S.sinkV;
+  const body=mix(C.ink,C.rock,sk*.92),headC=mix(C.ink,C.rock,sk*.55);
+  ctx.save();ctx.globalAlpha=alpha;ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.fillStyle=C.ink;ctx.fillRect(x-h*.3,fy,h*.6,g.R*.35);
+  const hip={x,y:fy-h*.45},sh={x,y:fy-h*.78},head={x,y:fy-h*.92};
+  const hands=[{x:x-h*.32,y:sh.y-h*.2},{x:x+h*.32,y:sh.y-h*.2}],feet=[{x:x-h*.11,y:fy},{x:x+h*.11,y:fy}];
+  // chains
+  chainTo(hands[0],{x:x-h*.5,y:sh.y-h*.3},1-sk);chainTo(hands[1],{x:x+h*.5,y:sh.y-h*.3},1-sk);
+  chainTo(feet[0],{x:x-h*.3,y:fy-h*.04},1-sk);chainTo(feet[1],{x:x+h*.3,y:fy-h*.04},1-sk);
+  ctx.strokeStyle=body;ctx.fillStyle=body;ctx.lineWidth=h*.07;
+  feet.forEach(f=>{ctx.beginPath();ctx.moveTo(hip.x,hip.y);ctx.lineTo(f.x*.6+hip.x*.4,(f.y+hip.y)/2);ctx.lineTo(f.x,f.y);ctx.stroke();});
+  hands.forEach(hd=>{ctx.beginPath();ctx.moveTo(sh.x,sh.y);ctx.lineTo((sh.x+hd.x)/2,sh.y-h*.04);ctx.lineTo(hd.x,hd.y);ctx.stroke();});
+  ctx.lineWidth=h*.14;ctx.beginPath();ctx.moveTo(hip.x,hip.y);ctx.lineTo(sh.x,sh.y);ctx.stroke();
+  ctx.strokeStyle=C.clay;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(hip.x-h*.06,hip.y-h*.02);ctx.lineTo(hip.x+h*.06,hip.y-h*.05);ctx.stroke();
+  // head (front view)
+  ctx.fillStyle=headC;ctx.beginPath();ctx.arc(head.x,head.y,h*.085,0,7);ctx.fill();
+  ctx.beginPath();ctx.moveTo(head.x-h*.06,head.y+h*.03);ctx.lineTo(head.x,head.y+h*.16);ctx.lineTo(head.x+h*.06,head.y+h*.03);ctx.fill();
+  ctx.fillStyle=S.forget?C.bone:C.clay;
+  [-1,1].forEach(k=>{ctx.beginPath();ctx.arc(head.x+k*h*.03,head.y-h*.012,Math.max(1.2,h*.012),0,7);ctx.fill();});
+  ctx.strokeStyle=C.clay;ctx.lineWidth=Math.max(1,h*.012);ctx.beginPath();
+  if(S.tired){ctx.moveTo(head.x-h*.025,head.y+h*.04);ctx.lineTo(head.x+h*.025,head.y+h*.04);}
+  else ctx.arc(head.x,head.y+h*.06,h*.025,Math.PI+.4,-.4);
+  ctx.stroke();
+  ctx.restore();
+  // stone grain across him as he sinks
+  if(sk>.02){ctx.save();ctx.beginPath();ctx.rect(x-h*.45,head.y-h*.15,h*.9,fy-head.y+h*.15);ctx.clip();strata(sk*alpha);ctx.restore();}
+  S.heads.P=head;
+}
+function liver(alpha){
+  const L=liverPt(),h=g.h,gr=S.g;
+  const r=h*.055*(.25+.75*gr),late=S.st==='grow'&&S.over>=2.2;
+  ctx.save();ctx.globalAlpha=alpha;
+  ctx.strokeStyle=C.bone;ctx.lineWidth=2;ctx.globalAlpha=alpha*.55;
+  ctx.beginPath();ctx.arc(L.x,L.y,h*.11,-Math.PI/2,-Math.PI/2+Math.PI*2*gr);ctx.stroke();ctx.globalAlpha=alpha;
+  ctx.fillStyle=late?C.grey:gr>=1?C.gold:mix(C.deep,C.gold,gr);
+  ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.ellipse(L.x,L.y,r*1.25,r,-.3,0,7);ctx.fill();ctx.stroke();
+  if(gr>=1&&!late&&S.st==='grow'){ctx.fillStyle=C.bone;const t=(S.phase*1.6)%1;ctx.globalAlpha=alpha*(1-t);
+    ctx.beginPath();ctx.arc(L.x+r*.6,L.y-r*.5-t*6,1.8,0,7);ctx.fill();}
+  if(late){ctx.strokeStyle=C.ink;ctx.lineWidth=1.2;for(let i=-1;i<=1;i++){const t=(S.phase+i*.3)%1;ctx.globalAlpha=alpha*(1-t);
+    ctx.beginPath();ctx.moveTo(L.x+i*5,L.y-r-2-t*10);ctx.quadraticCurveTo(L.x+i*5+3,L.y-r-6-t*10,L.x+i*5,L.y-r-10-t*10);ctx.stroke();}}
+  ctx.restore();
+}
+function eagle(alpha){
+  if(!S.eagleOn)return;
+  const p=eaglePos(),R=g.R,x=p.x,y=p.y,dir=p.back?-1:1;
+  ctx.save();ctx.globalAlpha=alpha;ctx.translate(x,y);ctx.scale(dir,1);
+  ctx.fillStyle=C.ink;ctx.strokeStyle=C.ink;ctx.lineJoin='round';ctx.lineCap='round';
+  // tail
+  ctx.beginPath();ctx.moveTo(-R*.7,0);ctx.lineTo(-R*1.55,R*.35);ctx.lineTo(-R*1.45,-R*.1);ctx.closePath();ctx.fill();
+  // wings
+  if(p.fly){const f=Math.sin(S.phase*(S.tired?9:16))*.9;
+    ctx.beginPath();ctx.moveTo(-R*.3,-R*.1);ctx.lineTo(-R*.2-R*.8,-R*.2-R*1.5*Math.cos(f));ctx.lineTo(R*.55,-R*.2);ctx.closePath();ctx.fill();}
+  // body
+  ctx.beginPath();ctx.ellipse(0,0,R*.9,R*.5,-.2,0,7);ctx.fill();
+  if(!p.fly){ctx.beginPath();ctx.moveTo(-R*.6,-R*.15);ctx.lineTo(R*.35,-R*.35);ctx.lineTo(R*.2,R*.15);ctx.lineTo(-R*.9,R*.25);ctx.closePath();ctx.fill();
+    ctx.strokeStyle=C.clay;ctx.lineWidth=1.2;for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(-R*(.6-i*.25),-R*(.05+i*.06));ctx.lineTo(-R*(.85-i*.25),R*(.2));ctx.stroke();}
+    ctx.strokeStyle=C.ink;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-R*.1,R*.45);ctx.lineTo(-R*.1,R*.7);ctx.moveTo(R*.2,R*.42);ctx.lineTo(R*.2,R*.7);ctx.stroke();}
+  // head + hooked beak
+  const hx=R*.78,hy=-R*.45;
+  ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(hx,hy,R*.33,0,7);ctx.fill();
+  ctx.beginPath();ctx.moveTo(hx+R*.22,hy-R*.12);ctx.quadraticCurveTo(hx+R*.62,hy-R*.08,hx+R*.52,hy+R*.22);ctx.lineTo(hx+R*.26,hy+R*.1);ctx.closePath();ctx.fill();
+  // eye
+  ctx.fillStyle=C.clay;ctx.strokeStyle=C.clay;ctx.lineWidth=1.4;
+  if(S.tired){ctx.beginPath();ctx.moveTo(hx+R*.02,hy-R*.06);ctx.lineTo(hx+R*.16,hy-R*.06);ctx.stroke();}
+  else{ctx.beginPath();ctx.arc(hx+R*.1,hy-R*.07,Math.max(1.3,R*.06),0,7);ctx.fill();}
+  // the uniform: your laurel wreath from the last job
+  ctx.fillStyle=C.bone;for(let i=0;i<4;i++){const a=Math.PI*(1.15+i*.22);ctx.beginPath();ctx.ellipse(hx+Math.cos(a)*R*.33,hy+Math.sin(a)*R*.33,R*.11,R*.045,a+Math.PI/2,0,7);ctx.fill();}
+  ctx.restore();
+  S.heads.E={x:x+dir*R*.78,y:y-R*.45};
+}
+function human(alpha){
+  const hm=S.human;if(!hm)return;
+  const h=g.h*.8,x=hm.x,fy=g.gy,sw=Math.sin(hm.walk),d=hm.dir||1;
+  ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=C.ink;ctx.fillStyle=C.ink;ctx.lineCap='round';ctx.lineWidth=h*.07;
+  const hip={x,y:fy-h*.45},sh={x,y:fy-h*.77},head={x:x+d*h*.02,y:fy-h*.9};
+  [[1],[-1]].forEach(([k])=>{ctx.beginPath();ctx.moveTo(hip.x,hip.y);ctx.lineTo(x+k*h*.12*sw,fy);ctx.stroke();});
+  ctx.lineWidth=h*.12;ctx.beginPath();ctx.moveTo(hip.x,hip.y);ctx.lineTo(sh.x,sh.y);ctx.stroke();
+  ctx.lineWidth=h*.07;const th={x:x+d*h*.22,y:sh.y-h*.12};
+  ctx.beginPath();ctx.moveTo(sh.x,sh.y);ctx.lineTo(th.x,th.y);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(sh.x,sh.y);ctx.lineTo(x-d*h*.1*sw,sh.y+h*.28);ctx.stroke();
+  ctx.beginPath();ctx.arc(head.x,head.y,h*.085,0,7);ctx.fill();
+  // torch
+  ctx.lineWidth=h*.035;ctx.beginPath();ctx.moveTo(th.x,th.y+h*.08);ctx.lineTo(th.x,th.y-h*.18);ctx.stroke();
+  const fl=1+Math.sin(S.phase*20)*.15;
+  ctx.fillStyle=C.gold;ctx.beginPath();ctx.ellipse(th.x,th.y-h*.27,h*.05,h*.09*fl,0,0,7);ctx.fill();
+  ctx.fillStyle=C.bone;ctx.beginPath();ctx.ellipse(th.x,th.y-h*.24,h*.022,h*.045*fl,0,0,7);ctx.fill();
+  ctx.restore();
+  S.heads.M=head;
+}
+function bubble(){
+  const b=S.bubble;if(!b)return;const hd=S.heads[b.who];if(!hd)return;
+  const fs=Math.max(12,Math.min(16,g.R*.62));
+  ctx.save();ctx.font=`700 ${fs}px ${FONT}`;
+  const tw=ctx.measureText(b.t).width,pw=tw+fs*1.1,ph=fs*1.9;
+  let x=hd.x-pw*.5,y=hd.y-g.R*1.3-ph;
+  x=Math.max(6,Math.min(W-pw-6,x));y=Math.max(g.band*2+4,y);
+  ctx.globalAlpha=Math.min(1,b.life*4)*(1-S.vanish);
+  ctx.fillStyle=C.bone;ctx.strokeStyle=C.ink;ctx.lineWidth=2;
+  ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,pw,ph,6):ctx.rect(x,y,pw,ph);ctx.fill();ctx.stroke();
+  const tx=Math.max(x+8,Math.min(x+pw-18,hd.x-5));
+  ctx.beginPath();ctx.moveTo(tx,y+ph-1);ctx.lineTo(tx+10,y+ph-1);ctx.lineTo(hd.x,hd.y-g.R*.35);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(tx,y+ph);ctx.lineTo(hd.x,hd.y-g.R*.35);ctx.lineTo(tx+10,y+ph);ctx.stroke();
+  ctx.fillStyle=C.ink;ctx.textBaseline='middle';ctx.textAlign='left';ctx.fillText(b.t,x+fs*.55,y+ph/2+1);
+  ctx.restore();
+}
+function overlays(){
+  S.dust.forEach(d=>{ctx.globalAlpha=Math.min(1,d.life*2);ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,7);ctx.fill();});
+  ctx.globalAlpha=1;
+  S.popups.forEach(p=>{
+    ctx.save();ctx.globalAlpha=Math.min(1,p.life*2);
+    const fs=Math.max(p.small?11:13,g.R*(p.hot?.75:p.small?.45:.6));ctx.font=`900 ${fs}px ${FONT}`;ctx.textAlign='center';
+    const tw=ctx.measureText(p.t).width/2+8,x=Math.max(tw,Math.min(W-tw,p.x));
+    ctx.lineWidth=p.small?3:4;ctx.strokeStyle=C.ink;ctx.strokeText(p.t,x,p.y);
+    ctx.fillStyle=p.hot?C.gold:C.bone;ctx.fillText(p.t,x,p.y);ctx.restore();
+  });
+}
+function finale(){
+  const m=S.mt;if(!m)return;
+  if(m.textOn){
+    ctx.save();ctx.globalAlpha=m.textA;ctx.textAlign='center';ctx.textBaseline='middle';
+    const fs=Math.max(17,Math.min(30,W*.04));ctx.font=`900 ${fs}px ${FONT}`;
+    const y=g.cliffTop*.55+H*.12;
+    ctx.lineWidth=5;ctx.strokeStyle=C.bone;ctx.strokeText('剩下的，是那座无法解释的山。',W/2,y);
+    ctx.fillStyle=C.ink;ctx.fillText('剩下的，是那座无法解释的山。',W/2,y);ctx.restore();
+  }
+  if(m.rock){
+    const R=g.R*1.1,x=m.rock.x,y=g.gy-R;
+    ctx.save();ctx.translate(x,y);ctx.rotate(x/R);
+    ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(0,0,R,0,7);ctx.fill();
+    ctx.fillStyle=C.bone;ctx.strokeStyle=C.bone;ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(-R*.32,-R*.2,R*.1,0,7);ctx.arc(R*.32,-R*.2,R*.1,0,7);ctx.fill();
+    ctx.beginPath();ctx.arc(0,R*.08,R*.42,.35,Math.PI-.35);ctx.stroke();ctx.restore();
+  }
+}
+function draw(){
+  if(!W||!H)return;
+  ctx.save();
+  if(S.shake>0){const k=S.shake*24;ctx.translate((Math.random()-.5)*k,(Math.random()-.5)*k);}
+  scene();
+  const a=1-S.vanish;
+  tree(a);liver(a);prometheus(a);human(a);eagle(a);overlays();
+  if(S.fogV>.005){ctx.fillStyle=C.bone;ctx.globalAlpha=S.fogV;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;}
+  bubble();finale();
+  ctx.restore();
+}
+
+// ---------- sound ----------
+let ac=null,sound=true;
+try{sound=localStorage.getItem('gods-sound')!=='0'}catch(e){}
+function syncSound(){$('btnSound').textContent='声音：'+(sound?'开':'关');$('btnSound').setAttribute('aria-pressed',sound);}
+syncSound();
+function tone(type,freqs,step,vol,len){
+  const t=ac.currentTime,o=ac.createOscillator(),gn=ac.createGain();
+  o.type=type;o.connect(gn);gn.connect(ac.destination);
+  freqs.forEach((f,i)=>o.frequency.setValueAtTime(f,t+i*step));
+  gn.gain.setValueAtTime(vol,t);gn.gain.exponentialRampToValueAtTime(.001,t+len);o.start(t);o.stop(t+len+.02);return o;
+}
+function sfx(kind){
+  if(!sound||!ac)return;const t=ac.currentTime;
+  if(kind==='peck'){const o=tone('triangle',[320],0,.3,.14);o.frequency.exponentialRampToValueAtTime(110,t+.12);}
+  else if(kind==='whoosh'){const o=tone('sine',[520],0,.06,.3);o.frequency.exponentialRampToValueAtTime(180,t+.28);}
+  else if(kind==='gong'){const o=tone('sine',[110],0,.22,1.4);o.frequency.exponentialRampToValueAtTime(98,t+1.2);}
+  else if(kind==='pop')tone('square',[520,780],.06,.06,.16);
+  else if(kind==='tick')tone('triangle',[880],0,.04,.05);
+  else if(kind==='wind'){const o=tone('sine',[180],0,.08,3);o.frequency.exponentialRampToValueAtTime(90,t+3);}
+}
+function ensureAudio(){if(!sound)return;if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(ac&&ac.state==='suspended')ac.resume();}
+
+// ---------- input ----------
+function begin(){
+  ensureAudio();$('ovTitle').hidden=true;$('ovEnd').hidden=true;document.body.classList.remove('quiet');
+  reset('story');go(0);
+}
+$('btnStart').addEventListener('click',e=>{e.stopPropagation();begin();});
+$('btnAgain').addEventListener('click',e=>{e.stopPropagation();begin();});
+$('btnSound').addEventListener('click',()=>{sound=!sound;try{localStorage.setItem('gods-sound',sound?'1':'0')}catch(e){}syncSound();if(sound)ensureAudio();});
+document.querySelectorAll('.card').forEach(c=>c.addEventListener('pointerdown',e=>e.stopPropagation()));
+cvs.addEventListener('pointerdown',e=>{e.preventDefault();tap(e);});
+$('chapCard').addEventListener('pointerdown',e=>{e.preventDefault();tap(e);});
+$('dlg').addEventListener('pointerdown',e=>{e.preventDefault();tap(e);});
+addEventListener('keydown',e=>{
+  if((e.code==='Space'||e.code==='Enter')&&S.mode==='story'&&!(e.target instanceof HTMLButtonElement)&&!(e.target instanceof HTMLAnchorElement)){e.preventDefault();tap(null);}
+});
+
+// ---------- loop ----------
+resize();reset('title');hud();
+let last=performance.now();
+function loop(now){
+  const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(W>0){update(dt);draw();}requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
