@@ -188,7 +188,11 @@ const SCRIPT=[
 
   {t:'chapter',n:'第三章',title:'石头先生'},
   {t:'say',who:'H',text:'宙斯看了你的第二份周报。'},
-  {t:'say',who:'H',text:()=>S.despair>=55?'他说“还行”的时候，语气缓和了一点。':'他说，再这样就调你去看守坦塔罗斯的葡萄。'},
+  {t:'say',who:'H',text:()=>{const b=S.beh,hs=b.hs,avg=hs.length?hs.reduce((a,c)=>a+c,0)/hs.length:0,early=hs.filter(h=>h<.35).length;
+    if(b.letTop)return '他问为什么有一次让他推上去了。我说那是压力测试。';
+    if(hs.length&&early>=hs.length/2)return '他说你踹得太早了。这叫没耐心，不叫惩罚。';
+    if(avg>.8)return '他说你踹得很准。准到他有点担心你。';
+    return S.despair>=55?'他说“还行”的时候，语气缓和了一点。':'他说，再这样就调你去看守坦塔罗斯的葡萄。';}},
   {t:'say',who:'N',text:'这段时间，西西弗斯在石头上画了一张脸。'},
   {t:'do',fn:()=>{S.face=true;burst(center(S.f).x,center(S.f).y,8);sfx('pop');}},
   {t:'say',who:'S',text:'介绍一下，这是石头先生。'},
@@ -226,6 +230,12 @@ const SCRIPT=[
   {t:'say',who:'H',text:'宙斯看了这个月的报表。'},
   {t:'say',who:'H',text:'绝望指数：零。'},
   {t:'say',who:'H',text:'他把杯子摔了。金的。'},
+  {t:'say',who:'H',text:()=>{const b=S.beh,hs=b.hs,late=hs.filter(h=>h>.85).length,early=hs.filter(h=>h<.35).length;
+    if(b.letTop>=2)return `他还注意到，你放他登顶了 ${b.letTop} 次。他说你这是在培养他。`;
+    if(hs.length&&late>=hs.length*.6)return '不过他承认，你每一脚都踹在离山顶一步的地方。手艺不错，适合去推。';
+    if(hs.length&&early>=hs.length*.6)return '他说你每次都踹得太早，西西弗斯连绝望的机会都没有。';
+    if(b.strikeKicks>=3)return '他还特别提到：罢工期间，你踹了三脚工会财产。';
+    return '他说你干得不好也不坏，这是最难处理的那种。';}},
   {t:'say',who:'H',text:'鉴于你的业绩，你被调岗了。新岗位：推石神。'},
   {t:'do',fn:()=>{S.finale=true;S.f=.02;S.fs=S.f-off();S.st='idle';S.vel=0;burst(pt(S.fs).x,pt(S.fs).y-g.R,10);sfx('pop');}},
   {t:'say',who:'S',text:'别担心，踹石神的岗位我已经申请到了。'},
@@ -242,7 +252,7 @@ function reset(mode){
     pushTime:mode==='story'?5.6:4.2,score:0,kicks:0,pushes:0,combo:0,despair:15,showMeter:false,zen:false,face:false,sign:false,book:null,finale:false,
     burst:0,burstChecked:false,kick:0,kickFrom:'sky',kickPt:null,shake:0,squash:0,wob:0,flash:0,
     bubble:null,popups:[],dust:[],phase:0,ri:0,left:0,lines:null,wait:0,chapT:0,typing:false,tw:0,full:'',strikeT:0,strikeTaps:0,strikeEnd:0,
-    autoAt:.6+Math.random()*.3,walkDecay:0});
+    autoAt:.6+Math.random()*.3,walkDecay:0,beh:{hs:[],letTop:0,strikeKicks:0},rbT:0,habit:.9});
 }
 function say(t,dur=1.8){S.bubble={t,life:dur};}
 function addDespair(d){S.despair=Math.max(0,Math.min(100,S.despair+d));}
@@ -271,7 +281,7 @@ function go(i){
     case 'wait':S.wait=s.d;setHint('');break;
     case 'play':setHint(s.hint);S.left=s.n;S.ri=0;S.lines=s.lines;S.combo=0;startPush();break;
     case 'strike':setHint(s.hint);S.st='strike';S.sign=true;S.strikeT=0;S.strikeTaps=0;S.strikeEnd=0;say('罢工中。',2.2);break;
-    case 'finale':setHint(s.hint);S.left=s.n;S.ri=0;S.lines=s.lines;S.st='fpush';break;
+    case 'finale':setHint(s.hint);S.left=s.n;S.ri=0;S.lines=s.lines;learnHabit();S.st='fpush';break;
     case 'end':
       S.mode='end';setHint('');saveProgress(p=>{p.done=true;});
       $('endText').textContent=`你在踹石神任上踹了 ${S.kicks} 脚，绩效 ${S.score}。现在，你也有了一块自己的石头。`;
@@ -306,7 +316,7 @@ function kick(){
   S.st='roll';S.vel=-(0.55+0.55*h);S.timer=0;S.kick=.38;S.kickFrom='sky';S.shake=reduce?0:.22;S.squash=1;S.stopped=false;S.landed=false;S.walkDecay=0;
   const c=center(S.f);burst(c.x,c.y,10);sfx('kick');
   if(S.mode!=='story'){say(pick(['……','又来？','行吧。']));return;}
-  S.kicks++;
+  S.kicks++;S.beh.hs.push(h);
   let pts,label,d;
   if(h<.35&&!S.zen){
     pts=h<.2?1:Math.round(h*h*100);S.combo=0;label=(h<.2?'太早了':'还行')+`  +${pts}`;d=-4;
@@ -330,13 +340,29 @@ function sisKick(){
   S.st='roll';S.vel=-1.0;S.timer=0;S.kick=.38;S.kickFrom='sis';S.kickPt={x:c.x+g.R*.55,y:c.y-g.R*.7};
   S.shake=reduce?0:.2;S.squash=1;S.stopped=false;S.landed=false;
   burst(c.x,c.y,10);sfx('kick');S.pushes++;
-  const L=S.lines;say(L.kicked[S.ri%L.kicked.length],1.8);
+  const L=S.lines;say(S.ri===0?habitLine():L.kicked[S.ri%L.kicked.length],2);
+  if(S.ri===0&&S.beh.hs.length)S.popups.push({x:c.x,y:c.y-g.R*2.2,t:'他用的是你的踹法',life:1.8,small:true});
 }
 
+// Letting him reach the top is a valid (if cruel) way to play: it rolls back and still counts as a round.
 function rollback(){
-  S.f=.02;S.fs=S.f-off();S.flash=reduce?0:.6;S.combo=0;
+  S.beh.letTop++;
+  S.f=.02;S.fs=S.f-off();S.flash=reduce?0:.6;S.combo=0;S.st='idle';
   S.popups.push({x:W/2,y:H*.45,t:'检测到违规登顶 · 已回滚',life:1.8,hot:true});
-  say('啊？？',1.4);sfx('pop');
+  say(S.beh.letTop>1?'又回滚？':'啊？？',1.4);sfx('pop');
+  if(S.showMeter&&!S.zen){addDespair(6);hud();}
+  S.rbT=1.4;
+}
+// The habit he learned from you: the median height of your kicks.
+function learnHabit(){
+  const hs=S.beh.hs.filter(h=>h>0).slice().sort((a,b)=>a-b);
+  S.habit=hs.length?Math.max(.45,Math.min(.9,hs[Math.floor(hs.length/2)])):.9;
+}
+function habitLine(){
+  if(!S.beh.hs.length)return '新来的？';
+  if(S.habit<.6)return '你以前就是这么早踹我的。';
+  if(S.habit>=.85)return '差一步再踹。跟你学的。';
+  return '我学的是你的节奏。';
 }
 
 function roundDone(){
@@ -348,7 +374,7 @@ function roundDone(){
 
 function strikeTap(){
   if(S.kick>0||S.strikeEnd>0)return;
-  S.kick=.38;S.kickFrom='sky';S.wob=.5;S.shake=reduce?0:.12;sfx('kick');S.strikeTaps++;
+  S.kick=.38;S.kickFrom='sky';S.wob=.5;S.shake=reduce?0:.12;sfx('kick');S.strikeTaps++;S.beh.strikeKicks=S.strikeTaps;
   const c=center(S.f);burst(c.x,c.y,6);
   say(['它已经在山脚了。','再踹也还是山脚。','你踹的是工会财产。'][Math.min(S.strikeTaps-1,2)],1.6);
   if(S.strikeTaps>=3)S.strikeEnd=1.6;
@@ -374,6 +400,7 @@ function burst(x,y,n){
 // ---------- update ----------
 function update(dt){
   S.phase+=dt;
+  if(S.rbT>0){S.rbT-=dt;if(S.rbT<=0&&S.mode==='story')roundDone();}
   if(S.mode==='story'&&S.step){
     const s=S.step;
     if(s.t==='chapter'){S.chapT+=dt;if(S.chapT>2.2)next();}
@@ -396,7 +423,7 @@ function update(dt){
     if(S.f>=1){if(S.mode==='story')rollback();else kick();}
   }else if(S.st==='fpush'){
     S.f=Math.max(.02,S.f-.035*dt);S.fs=S.f-off();
-    if(S.f>=.9)sisKick();
+    if(S.f>=S.habit)sisKick();
   }else if(S.st==='roll'){
     const wasUp=S.f>0;
     if(S.f>0)S.vel-=2.0*dt;
@@ -405,10 +432,10 @@ function update(dt){
     if(wasUp&&S.f<=0&&!S.landed){S.landed=true;const c=center(0);burst(c.x,c.y+g.R,14);S.shake=reduce?0:.18;sfx('land');}
     if(S.f<fmin()){S.f=fmin();S.vel=-S.vel*.3;}
     S.timer+=dt;S.squash=Math.max(0,S.squash-dt*1.4);
-    if(S.timer>.85){
+    if(S.timer>(S.ri>0?.5:.85)){
       const target=S.f-off();
       if(S.fs>target+.001){
-        S.fs=Math.max(target,S.fs-.42*dt);S.walk+=dt*10;S.walking=true;
+        S.fs=Math.max(target,S.fs-(S.ri>0?.8:.42)*dt);S.walk+=dt*10;S.walking=true;
         if(S.mode==='story'&&S.showMeter&&!S.zen&&!S.finale){addDespair(-1.8*dt);S.walkDecay+=1.8*dt;hud();}
       }else{
         S.walking=false;
