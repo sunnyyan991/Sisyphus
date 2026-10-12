@@ -1,0 +1,33 @@
+; Engine configuration file.
+config_version=5
+
+[application]
+
+config/name="诸神的差事"
+config/description="一组荒诞短剧：你是奥林匹斯新录用的公务员，每一集被调去一份新的天罚岗位。"
+run/main_scene="res://scenes/menu.tscn"
+config/features=PackedStringArray("4.3", "GL Compatibility")
+config/icon="res://icon.svg"
+
+[autoload]
+
+Game="*res://scripts/game.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=4
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=false
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+anti_aliasing/quality/msaa_2d=2
+environment/defaults/default_clear_color=Color(0.788, 0.416, 0.196, 1)
