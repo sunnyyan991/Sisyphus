@@ -33,6 +33,8 @@ var heads := {}          # speaker -> Vector2 anchor for speech bubbles
 
 # ---------- UI nodes ----------
 var stage: Control
+var bg_layer: CachedLayer   # static backdrop, rendered once into a texture
+var fx_layer: Control   # everything that moves, redrawn every frame
 var hud_box: HBoxContainer
 var chap_value: Label
 var who_label: Label
@@ -73,6 +75,7 @@ func custom_step(_s: Dictionary) -> bool: return false
 func custom_tap(_s: Dictionary, _pos) -> void: pass
 func custom_key(_e: InputEventKey) -> bool: return false
 func custom_update(_dt: float) -> void: pass
+func draw_backdrop(_cv: CanvasItem) -> void: pass
 func draw_scene(_cv: CanvasItem) -> void: pass
 func draw_front(_cv: CanvasItem) -> void: pass
 func end_texts() -> Dictionary: return {"text": "", "quote": "", "verdict": ""}
@@ -171,8 +174,15 @@ func _build_ui() -> void:
 	stage.clip_contents = true
 	stage.mouse_filter = Control.MOUSE_FILTER_STOP
 	frame.add_child(stage)
-	stage.draw.connect(_on_stage_draw)
 	stage.gui_input.connect(_on_stage_input)
+	bg_layer = CachedLayer.new()
+	bg_layer.paint.connect(func(c): draw_backdrop(c))
+	stage.add_child(bg_layer)
+	fx_layer = Control.new()
+	fx_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	fx_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fx_layer.draw.connect(_on_stage_draw)
+	stage.add_child(fx_layer)
 	_build_cards()
 
 	# dialogue scroll
@@ -508,7 +518,19 @@ func _process(dt: float) -> void:
 		d["p"] += d["v"] * dt
 		d["v"].y += 220.0 * dt
 	dust = dust.filter(func(d): return d["life"] > 0.0)
-	stage.queue_redraw()
+	# screen shake moves the two layers instead of re-drawing the backdrop
+	var off := Vector2.ZERO
+	if shake > 0.0:
+		var k := shake * 30.0
+		off = Vector2((randf() - 0.5) * k, (randf() - 0.5) * k)
+	bg_layer.position = off
+	fx_layer.position = off
+	fx_layer.queue_redraw()
+
+
+## Ask for the static backdrop to be repainted (when something in it changes).
+func redraw_backdrop() -> void:
+	bg_layer.refresh()
 
 
 # ===== drawing =====
@@ -525,12 +547,9 @@ func xf_reset(cv: CanvasItem) -> void:
 
 
 func _on_stage_draw() -> void:
-	var cv := stage
+	var cv := fx_layer
 	var size := stage.size
 	shake_off = Vector2.ZERO
-	if shake > 0.0:
-		var k := shake * 30.0
-		shake_off = Vector2((randf() - 0.5) * k, (randf() - 0.5) * k)
 	xf_reset(cv)
 	heads.clear()
 	draw_scene(cv)

@@ -12,7 +12,9 @@ const QUIPS := {
 const QUIP_MID := {"sisyphus": 3, "prometheus": 4, "trolley": 4, "tbd": 99}
 
 var sel := 0
-var vases: Array[Control] = []
+var vases: Array[Control] = []        # one holder per vase
+var paints: Array[Control] = []       # the animated painting layer of each vase
+var layers: Array[Control] = []       # every layer, for full repaints
 var t := 0.0
 var info: VBoxContainer
 var scroll: ScrollContainer
@@ -66,10 +68,17 @@ func _ready() -> void:
 		item.mouse_filter = Control.MOUSE_FILTER_STOP
 		item.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		item.gui_input.connect(_on_vase_input.bind(i))
+		# a vase is three stacked layers: body (static), painting (animated), bands and outline (static)
 		var canvas := Control.new()
 		canvas.custom_minimum_size = Vector2(165, 215)
 		canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		canvas.draw.connect(_draw_vase.bind(canvas, i))
+		for kind in ["base", "paint", "top"]:
+			var layer := CachedLayer.new()
+			layer.paint.connect(_draw_layer.bind(layer, i, kind))
+			canvas.add_child(layer)
+			layers.append(layer)
+			if kind == "paint":
+				paints.append(layer)
 		item.add_child(canvas)
 		var no := _label("第%s份差事" % e["no"], Game.sans, 11, Color(Game.INK, 0.7))
 		no.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -100,6 +109,7 @@ func _ready() -> void:
 	info.add_theme_constant_override("separation", 10)
 	panel.add_child(info)
 	_render_info()
+	_repaint_all.call_deferred()
 
 
 func _label(txt: String, font: Font, size: int, c: Color) -> Label:
@@ -218,6 +228,7 @@ func _select(i: int) -> void:
 	Game.set_menu_sel(i)
 	Game.sfx("tick")
 	_render_info()
+	_repaint_all()
 	var item: Control = vases[i].get_parent()
 	scroll.ensure_control_visible(item)
 
@@ -236,8 +247,18 @@ func _unhandled_input(ev: InputEvent) -> void:
 
 func _process(dt: float) -> void:
 	t += dt
-	for v in vases:
-		v.queue_redraw()
+	paints[sel].refresh()
+
+
+func _repaint_all() -> void:
+	for l in layers:
+		l.refresh()
+	for i in vases.size():
+		var lift := -8.0 if i == sel else 0.0
+		for l in vases[i].get_children():
+			l.position.y = lift
+		# unselected vases fade a little toward the wall
+		vases[i].modulate = Color(1, 1, 1, 1.0 if i == sel else 0.72)
 
 
 # ---------- the vase ----------
@@ -254,15 +275,32 @@ func _vase_poly(w: float, h: float) -> PackedVector2Array:
 	return pts
 
 
-## The vase's left edge as (y -> x), from its outline. The vase is symmetric.
-func _left_x(poly: PackedVector2Array, w: float, y: float) -> float:
-	var half := poly.size() / 2
-	for i in range(1, half):
-		var a := poly[i - 1]
-		var b := poly[i]
-		if (a.y <= y and b.y >= y) and b.y != a.y:
-			return lerpf(a.x, b.x, (y - a.y) / (b.y - a.y))
-	return w * 0.5
+var _geo_size := Vector2.ZERO
+var _poly := PackedVector2Array()
+var _left := PackedFloat32Array()   # left edge x for each pixel row
+
+
+func _geometry(w: float, h: float) -> PackedVector2Array:
+	if _geo_size != Vector2(w, h):
+		_geo_size = Vector2(w, h)
+		_poly = _vase_poly(w, h)
+		_left.resize(int(h) + 2)
+		var half := _poly.size() / 2
+		for row in _left.size():
+			var y := float(row)
+			_left[row] = w * 0.5
+			for i in range(1, half):
+				var a := _poly[i - 1]
+				var b := _poly[i]
+				if a.y <= y and b.y >= y and b.y != a.y:
+					_left[row] = lerpf(a.x, b.x, (y - a.y) / (b.y - a.y))
+					break
+	return _poly
+
+
+## The vase's left edge at height y. The vase is symmetric.
+func _left_x(_poly_unused: PackedVector2Array, _w: float, y: float) -> float:
+	return _left[clampi(int(y), 0, _left.size() - 1)]
 
 
 ## A horizontal band between y0 and y1 that follows the vase's outline.
@@ -280,73 +318,69 @@ func _band(c: CanvasItem, poly: PackedVector2Array, w: float, y0: float, y1: flo
 	c.draw_colored_polygon(left, col)
 
 
-func _draw_vase(c: Control, i: int) -> void:
+func _draw_layer(c: CanvasItem, layer: CachedLayer, i: int, kind: String) -> void:
 	var e: Dictionary = Game.EPISODES[i]
 	var active := i == sel
-	var w := c.size.x
-	var h := c.size.y
-	var lift := -8.0 if active else 0.0
-	c.draw_set_transform(Vector2(0, lift))
-	# shadow
-	Paint.ellipse(c, Vector2(w * 0.5, h * 0.975 - lift), w * 0.26, h * 0.018, 0.0, Color(Game.INK, 0.25))
-	# handles
-	for s in [[1.0, 0.36], [-1.0, 0.64]]:
-		var x: float = s[1]
-		var sg: float = s[0]
-		Paint.polyline(c, Paint.cubic_pts(Vector2(w * x, h * .12), Vector2(w * (x - sg * .2), h * .1), Vector2(w * (x - sg * .26), h * .24), Vector2(w * (x - sg * .14), h * .29)), Game.INK, maxf(3.0, w * 0.03))
-	var poly := _vase_poly(w, h)
-	c.draw_colored_polygon(poly, Game.CLAY)
-	Paint.ellipse(c, Vector2(w * 0.4, h * 0.45), w * 0.3, h * 0.2, 0.0, Color(Game.LIGHT, 0.6))
-	# the painted panel: draw the painting, then mask what falls outside the vase
-	var px := w * 0.1
-	var py := h * 0.3
-	var pw := w * 0.8
-	var ph := h * 0.42
-	cv = c
-	W = pw
-	H = ph
-	c.draw_set_transform(Vector2(px, py + lift))
-	_paint(e["id"], t if active else 1.4 + i, Game.ep_progress(e["id"]))
-	c.draw_set_transform(Vector2(0, lift))
-	var lm := PackedVector2Array([Vector2(-20, py - 4)])
-	var rm := PackedVector2Array([Vector2(w + 20, py - 4)])
-	for k in 15:
-		var y := lerpf(py - 4, py + ph + 4, k / 14.0)
-		var lx := _left_x(poly, w, y)
-		lm.append(Vector2(lx, y))
-		rm.append(Vector2(w - lx, y))
-	lm.append(Vector2(-20, py + ph + 4))
-	rm.append(Vector2(w + 20, py + ph + 4))
-	c.draw_colored_polygon(lm, Game.CLAY)
-	c.draw_colored_polygon(rm, Game.CLAY)
-	# lip, neck bands, tongues, rays and foot
-	_band(c, poly, w, h * 0.06, h * 0.09, Game.INK)
-	_band(c, poly, w, h * 0.15, h * 0.162, Game.INK)
-	for k in 14:
-		var x := w * (0.2 + k * 0.045)
-		var lx := _left_x(poly, w, h * 0.245)
-		if x > lx + 3 and x < w - lx - 3:
-			Paint.ellipse(c, Vector2(x, h * 0.245), w * 0.016, h * 0.022, 0.0, Game.INK)
-	_band(c, poly, w, h * 0.27, h * 0.278, Game.INK)
-	_band(c, poly, w, h * 0.72, h * 0.73, Game.INK)
-	_band(c, poly, w, h * 0.84, h * 0.97, Game.INK)
-	for k in 10:
-		var x := w * (0.24 + k * 0.058)
-		var lx := _left_x(poly, w, h * 0.84)
-		if x - w * 0.02 > lx and x + w * 0.02 < w - lx:
-			c.draw_colored_polygon(PackedVector2Array([Vector2(x - w * 0.02, h * 0.84), Vector2(x, h * 0.745), Vector2(x + w * 0.02, h * 0.84)]), Game.INK)
-	c.draw_line(Vector2(w * 0.31, h * 0.92), Vector2(w * 0.69, h * 0.92), Game.CLAY, 1.2)
-	Paint.ellipse(c, Vector2(w * 0.27, h * 0.48), w * 0.03, h * 0.12, -0.15, Color(Game.BONE, 0.18))
-	if not active:
-		c.draw_colored_polygon(poly, Color(0.72, 0.36, 0.17, 0.28))
-	var outline := poly.duplicate()
-	outline.append(poly[0])
-	c.draw_polyline(outline, Game.INK, 2.0, true)
-	if Game.ep_progress(e["id"])["done"]:
-		var r := Rect2(w * 0.7, h * 0.02, 52, 20)
-		c.draw_rect(r, Game.INK)
-		Paint.text(c, Game.sans, r.get_center(), "已完成", 11, Game.GOLD, 0)
-	c.draw_set_transform(Vector2.ZERO)
+	var w := layer.size.x
+	var h := layer.size.y
+	var poly := _geometry(w, h)
+	if kind == "base":
+		Paint.ellipse(c, Vector2(w * 0.5, h * 0.975 + (8.0 if active else 0.0)), w * 0.26, h * 0.018, 0.0, Color(Game.INK, 0.25))
+		for s in [[1.0, 0.36], [-1.0, 0.64]]:
+			var x: float = s[1]
+			var sg: float = s[0]
+			Paint.polyline(c, Paint.cubic_pts(Vector2(w * x, h * .12), Vector2(w * (x - sg * .2), h * .1), Vector2(w * (x - sg * .26), h * .24), Vector2(w * (x - sg * .14), h * .29)), Game.INK, maxf(3.0, w * 0.03))
+		c.draw_colored_polygon(poly, Game.CLAY)
+		Paint.ellipse(c, Vector2(w * 0.4, h * 0.45), w * 0.3, h * 0.2, 0.0, Color(Game.LIGHT, 0.6))
+	elif kind == "paint":
+		# the painted panel: draw the painting, then mask what falls outside the vase
+		var px := w * 0.1
+		var py := h * 0.3
+		var pw := w * 0.8
+		var ph := h * 0.42
+		cv = c
+		W = pw
+		H = ph
+		c.draw_set_transform(Vector2(px, py))
+		_paint(e["id"], t if active else 1.4 + i, Game.ep_progress(e["id"]))
+		c.draw_set_transform(Vector2.ZERO)
+		var lm := PackedVector2Array([Vector2(-20, py - 4)])
+		var rm := PackedVector2Array([Vector2(w + 20, py - 4)])
+		for k in 15:
+			var y := lerpf(py - 4, py + ph + 4, k / 14.0)
+			var lx := _left_x(poly, w, y)
+			lm.append(Vector2(lx, y))
+			rm.append(Vector2(w - lx, y))
+		lm.append(Vector2(-20, py + ph + 4))
+		rm.append(Vector2(w + 20, py + ph + 4))
+		c.draw_colored_polygon(lm, Game.CLAY)
+		c.draw_colored_polygon(rm, Game.CLAY)
+	else:
+		# lip, neck bands, tongues, rays and foot
+		_band(c, poly, w, h * 0.06, h * 0.09, Game.INK)
+		_band(c, poly, w, h * 0.15, h * 0.162, Game.INK)
+		for k in 14:
+			var x := w * (0.2 + k * 0.045)
+			var lx := _left_x(poly, w, h * 0.245)
+			if x > lx + 3 and x < w - lx - 3:
+				Paint.ellipse(c, Vector2(x, h * 0.245), w * 0.016, h * 0.022, 0.0, Game.INK)
+		_band(c, poly, w, h * 0.27, h * 0.278, Game.INK)
+		_band(c, poly, w, h * 0.72, h * 0.73, Game.INK)
+		_band(c, poly, w, h * 0.84, h * 0.97, Game.INK)
+		for k in 10:
+			var x := w * (0.24 + k * 0.058)
+			var lx := _left_x(poly, w, h * 0.84)
+			if x - w * 0.02 > lx and x + w * 0.02 < w - lx:
+				c.draw_colored_polygon(PackedVector2Array([Vector2(x - w * 0.02, h * 0.84), Vector2(x, h * 0.745), Vector2(x + w * 0.02, h * 0.84)]), Game.INK)
+		c.draw_line(Vector2(w * 0.31, h * 0.92), Vector2(w * 0.69, h * 0.92), Game.CLAY, 1.2)
+		Paint.ellipse(c, Vector2(w * 0.27, h * 0.48), w * 0.03, h * 0.12, -0.15, Color(Game.BONE, 0.18))
+		var outline := poly.duplicate()
+		outline.append(poly[0])
+		c.draw_polyline(outline, Game.INK, 2.0, true)
+		if Game.ep_progress(e["id"])["done"]:
+			var r := Rect2(w * 0.7, h * 0.02, 52, 20)
+			c.draw_rect(r, Game.INK)
+			Paint.text(c, Game.sans, r.get_center(), "已完成", 11, Game.GOLD, 0)
 
 
 # ---------- paintings: each draws inside W×H, with marks left by progress ----------

@@ -557,9 +557,13 @@ func custom_update(dt: float) -> void:
 
 
 # ---------- drawing ----------
-func draw_scene(cv: CanvasItem) -> void:
+func draw_backdrop(cv: CanvasItem) -> void:
 	geo()
 	_scene(cv)
+
+
+func draw_scene(cv: CanvasItem) -> void:
+	geo()
 	_book(cv)
 	_actors(cv)
 	_boulder(cv)
