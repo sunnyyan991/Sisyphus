@@ -5,7 +5,7 @@
 ## 打开与运行
 
 1. 安装 [Godot 4.3](https://godotengine.org/download)（标准版即可，不需要 .NET）。
-2. 在 Godot 项目管理器里导入 `godot/project.godot`。
+2. 在 Godot 项目管理器里导入 `godot-project/project.godot`。
 3. 按 F5 运行，主场景是陶罐主界面 `scenes/menu.tscn`。
 
 渲染器使用 Compatibility（OpenGL），这样网页导出和低端设备都能跑。
@@ -70,3 +70,9 @@ SHOTS=/tmp/shots CH=3 godot --path . res://tests/play_sisyphus.tscn   # 从第�
 ## 网页导出
 
 `export_presets.cfg` 里已经有一个 Web 预设，关闭了多线程，导出后可以直接放到 GitHub Pages（不需要额外的跨域响应头）。需要先在 Godot 编辑器里安装对应版本的导出模板。
+
+```
+GODOT=/path/to/godot tools/export_web.sh ../build/web
+```
+
+线上测试版放在 `main` 分支的 `godot/` 文件夹里，地址是 https://sunnyyan991.github.io/Sisyphus/godot/ 。更新时重新导出，把导出的文件覆盖到 `main` 的 `godot/` 再推送。
